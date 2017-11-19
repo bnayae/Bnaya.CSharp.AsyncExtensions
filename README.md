@@ -8,6 +8,7 @@ Install-Package Bnaya.CSharp.AsyncExtensions
 ## This library have the following godies:
 * Exception Handlinfg
   * ThrowAll (produce AggregateException when waiting on Task.WhenAll)
+  * Format (format async exception into friendlier callstack represantation)
 * Timeout (will apply timeout semantic for any Task)
   * WithTimeout (will throw on timeout)
   * IsTimeoutAsync (will return indication without throwing, ideal for SLA checks [prctice: check and produce warning])
