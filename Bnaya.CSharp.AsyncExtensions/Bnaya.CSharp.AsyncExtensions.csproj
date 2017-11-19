@@ -4,18 +4,44 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Bnaya.CSharp.AsyncExtensions</AssemblyName>
     <RootNamespace>Bnaya.CSharp.AsyncExtensions</RootNamespace>
-    <Version>1.0.7</Version>
+    <Version>1.0.10</Version>
     <Description>Useful extensions contribution by Bnaya Eshet
-Blog: http://blogs.microsoft.co.il/bnaya/</Description>
+Blog: http://blogs.microsoft.co.il/bnaya/
+
+Source Code:
+https://github.com/bnayae/Bnaya.CSharp.AsyncExtensions
+
+
+# NuGet
+this library available on NuGet via
+Install-Package Bnaya.CSharp.AsyncExtensions
+
+## This library have the following godies:
+* Exception Handlinfg
+  * ThrowAll (produce AggregateException when waiting on Task.WhenAll)
+  * Format (format async exception into friendlier callstack represantation)
+* Timeout (will apply timeout semantic for any Task)
+  * WithTimeout (will throw on timeout)
+  * IsTimeoutAsync (will return indication without throwing, ideal for SLA checks [prctice: check and produce warning])
+* Cancellation
+  * CancelSafe (will run the CancellationTokenSource.Cancel within try catch and prevent unexpected side effect which can happen when cancellation token registration throw)
+  * RegisterWeak (use week registration to cancellation token, letting the GC to collect the instance of the registration even when the token is still alive, can reduce potential for memory leaks)
+* Frendly async locking facilities (which can replace the clasical lock statement).
+  * Extensions
+    * TryAcquireAsync
+    * AcquireAsync
+  * Instance-able
+    * AsyncLock 
+</Description>
     <Copyright>Bnaya Eshet ©</Copyright>
     <PackageTags>async, Parallel, await, task, timeout, deadlock, cancel, cancellation, bnaya</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageProjectUrl>http://blogs.microsoft.co.il/bnaya/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/bnayae/BeyondAsyncAwait</RepositoryUrl>
+    <RepositoryUrl>https://github.com/bnayae/Bnaya.CSharp.AsyncExtensions</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageIconUrl>https://github.com/bnayae/BeyondAsyncAwait/blob/master/20.%20Cool%20Extensions/async-ex.png?raw=true</PackageIconUrl>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
-    <FileVersion>1.0.7.0</FileVersion>
+    <AssemblyVersion>1.0.10.0</AssemblyVersion>
+    <FileVersion>1.0.10.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

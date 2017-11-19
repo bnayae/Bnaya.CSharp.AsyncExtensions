@@ -8,7 +8,7 @@ namespace System.Threading.Tasks
     /// <summary>
     /// Task Extensions
     /// </summary>
-    public static class TaskExtensions
+    public static class BnayaTaskExtensions
     {
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(15);
 

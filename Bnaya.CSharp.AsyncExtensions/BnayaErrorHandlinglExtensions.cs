@@ -11,7 +11,7 @@ namespace System.Threading.Tasks
     /// <summary>
     /// Task Extensions
     /// </summary>
-    public static class ErrorHandlinglExtensions
+    public static class BnayaErrorHandlinglExtensions
     {
         //private static readonly Regex ASYNC_REGEX = new Regex(@"\.(.*)\.<(.*)>d__"); // .{group 0 - any}.<{group 1 = any}>d__
         // "^\s*at = start with 'at ' optional preceding whitespace 
@@ -206,21 +206,6 @@ namespace System.Threading.Tasks
         }
 
         #endregion // HandleExceptionFlow
-
-        #region Plural
-
-        /// <summary>
-        /// Plurals the specified item.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="item">The item.</param>
-        /// <returns></returns>
-        public static IEnumerable<T> Plural<T>(this T item)
-        {
-            yield return item;
-        }
-
-        #endregion // Plural
     }
 }
 
