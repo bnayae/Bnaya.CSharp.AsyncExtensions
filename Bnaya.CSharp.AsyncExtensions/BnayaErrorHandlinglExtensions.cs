@@ -75,8 +75,9 @@ namespace System.Threading.Tasks
                     }
                 }
 
+                builder.AppendLine("Formatted Stacks");
                 List<string> keep = FormarRec(exception);
-                for (int i = keep.Count - 1; i >= 0; i--)
+                for (int i = 0; i < keep.Count; i++)
                 {
                     // TODO: Cleanup duplication (namespace / class name)
                     // TODO: try to capture the parameters
@@ -118,14 +119,14 @@ namespace System.Threading.Tasks
                 var exceptions = aggregate.Flatten().InnerExceptions;
                 if (exceptions.Count != 1)
                 {
-                    int count = exceptions.Count;
+                    int count = 1;
                     foreach (var ex in exceptions)
                     {
                         List<string> tmp = FormarRec(ex);
-                        stackDetails.AddRange(tmp); 
-                        stackDetails.Add($"\r\n\t~ {count--} ~> Reason = {ex?.GetBaseException()?.Message}, [{ex?.GetType()?.Name}]\r\n");
+                        stackDetails.Add($"\r\n ~ {count++} ~> ({ex?.GetType()?.Name}) Reason = {ex?.GetBaseException()?.Message}\r\n");
+                        stackDetails.AddRange(tmp);
                     }
-                    return stackDetails; // will be reversed
+                    return stackDetails;
                 }
                 exception = exceptions[0];
             }
@@ -135,14 +136,31 @@ namespace System.Threading.Tasks
                 var mtd = exception.TargetSite as MethodInfo;
                 if (mtd == null)
                 {
+                    #region Add Full Exception Details
+
                     stackDetails.Add("\r\n-----------------------------\r\n");
                     stackDetails.Add(exception.ToString());
                     stackDetails.Add("\r\n-----------------------------\r\n");
+
+                    #endregion // Add Full Exception Details
                     break;
                 }
-                string prms = string.Join(",", mtd?.GetParameters()?.Select(p => $"{p?.ParameterType?.Name} {p.Name}"));
 
                 var tmp = new List<string>();
+
+                #region tmp.Add("# Throw (exception)")
+
+                string message = string.Empty;
+                using (var reader = new StringReader(exception.Message))
+                {
+                    message = reader.ReadLine();
+                    if (message.Length > MAX_LEN_OF_INNER_SNAP_LINE)
+                        message = message.Substring(0, MAX_LEN_OF_INNER_SNAP_LINE) + " ...";
+                }
+                tmp.Add($"  # Throw ({exception?.GetType()?.Name}): {message}\r\n");
+
+                #endregion // tmp.Add("# Throw (exception)")
+
                 using (var r = new StringReader(exception.StackTrace))
                 {
                     while (true)
@@ -152,8 +170,12 @@ namespace System.Threading.Tasks
                             break;
                         line = line.Trim();
 
+                        #region Validation
+
                         if (IGNORE_START_WITH.Any(ignore => line.StartsWith(ignore)))
                             continue;
+
+                        #endregion // Validation
 
                         if (line.StartsWith("at System.Threading.ThreadHelper.ThreadStart()"))
                         {
@@ -205,29 +227,20 @@ namespace System.Threading.Tasks
                     }
                 }
 
-                if (exception != null)
+                #region Remove Duplicate Stack
+
+                if (tmp.Count != 0)
                 {
-                    string message = string.Empty;
-                    if (!(exception is AggregateException))
-                    {
-                        using (var reader = new StringReader(exception.Message))
-                        {
-                            message = reader.ReadLine();
-                            if (message.Length > MAX_LEN_OF_INNER_SNAP_LINE)
-                                message = message.Substring(0, MAX_LEN_OF_INNER_SNAP_LINE) + " ...";
-                        }
-                    }
-                    if (tmp.Count != 0)
-                    {
-                        var fst = stackDetails.Skip(1).FirstOrDefault();
-                        var lst = tmp[tmp.Count - 1];
-                        if (fst != null && fst == lst)
-                            tmp.Remove(fst);
-                    }
-                    tmp.Insert(0, $"\t\t# Throw ({message})\r\n");
+                    var fst = stackDetails.Skip(1).FirstOrDefault();
+                    var lst = tmp[tmp.Count - 1];
+                    if (fst != null && fst == lst)
+                        tmp.Remove(fst);
                 }
-                exception = exception.InnerException;
+
+                #endregion // Remove Duplicate Stack
+
                 stackDetails.InsertRange(0, tmp);
+                exception = exception.InnerException;
             }
             return stackDetails;
         }

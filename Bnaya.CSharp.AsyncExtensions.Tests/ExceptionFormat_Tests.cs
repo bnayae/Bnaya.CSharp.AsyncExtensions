@@ -23,19 +23,19 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 Assert.AreNotEqual(-1, idx0);
                 int idx1 = formatted.IndexOf(nameof(Step1Async));
                 Assert.AreNotEqual(-1, idx1);
-                Assert.IsTrue(idx1 > idx0);
+                Assert.IsTrue(idx1 < idx0);
                 int idx2 = formatted.IndexOf(nameof(Step2Async));
                 Assert.AreNotEqual(-1, idx2);
-                Assert.IsTrue(idx2 > idx1);
+                Assert.IsTrue(idx2 < idx1);
                 int idx3 = formatted.IndexOf(nameof(OtherClass.Step3Async));
                 Assert.AreNotEqual(-1, idx3);
-                Assert.IsTrue(idx3 > idx2);
+                Assert.IsTrue(idx3 < idx2);
                 int idx4 = formatted.IndexOf(nameof(OtherClass.Step4Async));
                 Assert.AreNotEqual(-1, idx4);
-                Assert.IsTrue(idx4 > idx3);
+                Assert.IsTrue(idx4 < idx3);
                 int idx5 = formatted.IndexOf(nameof(OtherClass.Step5Async));
                 Assert.AreNotEqual(-1, idx5);
-                Assert.IsTrue(idx5 > idx4);
+                Assert.IsTrue(idx5 < idx4);
 
                 // check duplication
                 int idx4x = formatted.IndexOf(nameof(OtherClass.Step4Async), idx4+ 2);
