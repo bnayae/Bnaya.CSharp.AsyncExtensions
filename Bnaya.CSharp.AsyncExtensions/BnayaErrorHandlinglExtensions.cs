@@ -13,6 +13,7 @@ namespace System.Threading.Tasks
     /// </summary>
     public static class BnayaErrorHandlinglExtensions
     {
+        private const int MAX_LEN_OF_INNER_SNAP_LINE = 50;
         //private static readonly Regex ASYNC_REGEX = new Regex(@"\.(.*)\.<(.*)>d__"); // .{group 0 - any}.<{group 1 = any}>d__
         // "^\s*at = start with 'at ' optional preceding whitespace 
         // (.*\)) = group any until ')'
@@ -45,20 +46,16 @@ namespace System.Threading.Tasks
         /// Simplify the exception.
         /// </summary>
         /// <param name="exception">The exception.</param>
-        /// <param name="includeToString">if set to <c>true</c> [include to string].</param>
+        /// <param name="includeFullUnformatedDetails">if set to <c>true</c> [include exception.ToString()].</param>
         /// <returns></returns>
         public static string Format(
-                this Exception exception, 
-                bool includeToString = false)
+                this Exception exception,
+                bool includeFullUnformatedDetails = false)
         {
             if (exception == null)
                 return string.Empty;
             try
             {
-                var keep = new List<string>();
-
-                FormarRec(exception, keep);
-
                 var builder = new StringBuilder();
                 builder.AppendLine("Root cause:");
                 var aggregate = exception as AggregateException;
@@ -78,12 +75,18 @@ namespace System.Threading.Tasks
                     }
                 }
 
+                List<string> keep = FormarRec(exception);
                 for (int i = keep.Count - 1; i >= 0; i--)
                 {
+                    // TODO: Cleanup duplication (namespace / class name)
+                    // TODO: try to capture the parameters
+                    string prev = string.Empty;
+                    if (i > 0)
+                        prev = keep[i - 1];
                     builder.Append(keep[i]);
                 }
 
-                if (includeToString)
+                if (includeFullUnformatedDetails)
                 {
                     builder.AppendLine("====================== FULL INFORMATION ============================");
                     builder.AppendLine(exception.ToString());
@@ -91,7 +94,7 @@ namespace System.Threading.Tasks
                 }
                 return builder.ToString();
             }
-            catch 
+            catch
             {
                 return exception.ToString();
             }
@@ -105,24 +108,24 @@ namespace System.Threading.Tasks
         /// Recursive formatting
         /// </summary>
         /// <param name="exception">The exception.</param>
-        /// <param name="keep">The keep.</param>
-        private static void FormarRec(
-            Exception exception,
-            List<string> keep)
+        /// <returns>Build it in reverse format</returns>
+        private static List<string> FormarRec(Exception exception)
         {
+            var stackDetails = new List<string>();
             var aggregate = exception as AggregateException;
             if (aggregate != null)
             {
                 var exceptions = aggregate.Flatten().InnerExceptions;
                 if (exceptions.Count != 1)
                 {
-                    int count = 0;
+                    int count = exceptions.Count;
                     foreach (var ex in exceptions)
                     {
-                        FormarRec(ex, keep);
-                        keep.Add($"\r\n#{count++}) Inner Exception [{ex?.GetType()?.Name}]: Reason = {ex?.GetBaseException()?.Message}\r\n");
+                        List<string> tmp = FormarRec(ex);
+                        stackDetails.AddRange(tmp); 
+                        stackDetails.Add($"\r\n\t~ {count--} ~> Reason = {ex?.GetBaseException()?.Message}, [{ex?.GetType()?.Name}]\r\n");
                     }
-                    return;
+                    return stackDetails; // will be reversed
                 }
                 exception = exceptions[0];
             }
@@ -132,13 +135,14 @@ namespace System.Threading.Tasks
                 var mtd = exception.TargetSite as MethodInfo;
                 if (mtd == null)
                 {
-                    keep.Add("\r\n-----------------------------\r\n");
-                    keep.Add(exception.ToString());
-                    keep.Add("\r\n-----------------------------\r\n");
+                    stackDetails.Add("\r\n-----------------------------\r\n");
+                    stackDetails.Add(exception.ToString());
+                    stackDetails.Add("\r\n-----------------------------\r\n");
                     break;
                 }
                 string prms = string.Join(",", mtd?.GetParameters()?.Select(p => $"{p?.ParameterType?.Name} {p.Name}"));
 
+                var tmp = new List<string>();
                 using (var r = new StringReader(exception.StackTrace))
                 {
                     while (true)
@@ -153,56 +157,79 @@ namespace System.Threading.Tasks
 
                         if (line.StartsWith("at System.Threading.ThreadHelper.ThreadStart()"))
                         {
-                            keep.Add("\tStart Thread:");
+                            tmp.Add("\tStart Thread:");
                             continue;
                         }
                         var m = ASYNC_REGEX1.Match(line);
                         if (m?.Success ?? false)
                         {
                             string data = $"\t{m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
-                            keep.Add(data);
+                            tmp.Add(data);
                             continue;
                         }
                         m = ASYNC_REGEX2.Match(line);
                         if (m?.Success ?? false)
                         {
                             string data = $"\tanonymous: {m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
-                            keep.Add(data);
+                            tmp.Add(data);
                             continue;
                         }
                         m = ASYNC_REGEX3.Match(line);
                         if (m?.Success ?? false)
                         {
                             string data = $"\t{m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
-                            keep.Add(data);
+                            tmp.Add(data);
                             continue;
                         }
                         m = ASYNC_REGEX4.Match(line);
                         if (m?.Success ?? false)
                         {
                             string data = $"\tanonymous: {m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
-                            keep.Add(data);
+                            tmp.Add(data);
                             continue;
                         }
                         m = ASYNC_REGEX5.Match(line);
                         if (m?.Success ?? false)
                         {
-                            keep.Add("\tStart Task: ");
+                            tmp.Add("\tStart Task: ");
                             continue;
                         }
                         m = SYNC_REGEX.Match(line);
                         if (m?.Success ?? false)
                         {
                             string data = m.Groups?[1]?.Value ?? "Missing";
-                            keep.Add($"\t{data} ->\r\n");
+                            tmp.Add($"\t{data} ->\r\n");
                             continue;
                         }
-                        keep.Add($"\t{line}\r\n");
+                        tmp.Add($"\t{line}\r\n");
                     }
                 }
 
+                if (exception != null)
+                {
+                    string message = string.Empty;
+                    if (!(exception is AggregateException))
+                    {
+                        using (var reader = new StringReader(exception.Message))
+                        {
+                            message = reader.ReadLine();
+                            if (message.Length > MAX_LEN_OF_INNER_SNAP_LINE)
+                                message = message.Substring(0, MAX_LEN_OF_INNER_SNAP_LINE) + " ...";
+                        }
+                    }
+                    if (tmp.Count != 0)
+                    {
+                        var fst = stackDetails.Skip(1).FirstOrDefault();
+                        var lst = tmp[tmp.Count - 1];
+                        if (fst != null && fst == lst)
+                            tmp.Remove(fst);
+                    }
+                    tmp.Insert(0, $"\t\t# Throw ({message})\r\n");
+                }
                 exception = exception.InnerException;
+                stackDetails.InsertRange(0, tmp);
             }
+            return stackDetails;
         }
 
         #endregion // HandleExceptionFlow

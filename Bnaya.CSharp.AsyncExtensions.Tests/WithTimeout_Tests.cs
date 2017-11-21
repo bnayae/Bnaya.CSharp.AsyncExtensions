@@ -8,7 +8,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
     public class WithTimeout_Tests
     {
         [TestMethod]
-        public async Task WithTimeout_Pass()
+        public async Task WithTimeout_Pass_Test()
         {
             await Task.Delay(1)
                       .WithTimeout(TimeSpan.FromMilliseconds(100))
