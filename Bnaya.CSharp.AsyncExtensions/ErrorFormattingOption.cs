@@ -14,8 +14,8 @@ namespace System.Threading.Tasks
         /// </summary>
         Default,
         /// <summary>
-        /// replace duplicate path (namespace / class) with dots
+        /// replace duplicate path (namespace / class) with a sign
         /// </summary>
-        DotForDuplicate
+        FormatDuplication
     }
 }

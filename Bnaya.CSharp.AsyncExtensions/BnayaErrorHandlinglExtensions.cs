@@ -18,6 +18,8 @@ namespace System.Threading.Tasks
     {
         private const int MAX_LEN_OF_INNER_SNAP_LINE = 50;
         private const string THROW_PREFIX = "  # Throw";
+        private const string START_TASK_TAG = " ~ Start Task ~>\r\n";
+        private const string START_ASYNC_TAG = " ~ Start ~>\r\n";
         //private static readonly Regex ASYNC_REGEX = new Regex(@"\.(.*)\.<(.*)>d__"); // .{group 0 - any}.<{group 1 = any}>d__
         // "^\s*at = start with 'at ' optional preceding whitespace 
         // (.*\)) = group any until ')'
@@ -42,7 +44,15 @@ namespace System.Threading.Tasks
                 "at System.Threading.Tasks.ContinuationTaskFromTask.InnerInvoke()",
                 "at System.Threading.QueueUserWorkItemCallback:",
                 "at System.Runtime.CompilerServices.AsyncTaskMethodBuilder",
+                "at System.Threading.Tasks.BnayaTaskExtensions.<>c.<ThrowAll>b__10_0(Task c)",
+                "at System.Threading.Tasks.Task.InnerInvokeWithArg",
+                "at System.Threading.Tasks.Task.<>c__DisplayClass",
+                "at System.Threading.Tasks.Task.ThrowIfExceptional",
+                "at System.Threading.Tasks.Task.Wait",
+                "at System.Threading.Tasks.Parallel.ForWorker",
             };
+
+        private static readonly Regex CHAR_OR_NUMERIC = new Regex(@"[\w|\d]"); // char or digit  
 
         #region Format
 
@@ -101,19 +111,32 @@ namespace System.Threading.Tasks
                 }
 
                 builder.AppendLine("Formatted Stacks");
-                List<string> keep = FormarRec(exception);
+                List<string> keep = FormaStack(exception);
                 string prev = null;
+                int lastCount = 0;
                 for (int i = 0; i < keep.Count; i++)
                 {
                     // TODO: try to capture the parameters
                     string candidate = keep[i];
                     string origin = candidate;
-                    if (option == ErrorFormattingOption.DotForDuplicate && 
-                        !origin.StartsWith(THROW_PREFIX))
+                    if (option == ErrorFormattingOption.FormatDuplication)
                     {
-                        if (prev != null)
-                            candidate = HideDuplicatePaths(prev, candidate, replaceWith);
-                        prev = origin;
+                        if (origin.StartsWith(THROW_PREFIX)) 
+                           prev = null;
+                        else
+                        {
+                            int count = 0;
+                            if (prev != null)
+                                (candidate, count) = HideDuplicatePaths(prev, candidate, replaceWith);
+                            prev = origin;
+                            if (lastCount > count)
+                            {
+                                candidate = origin; // when similarity decreased, it write the full information
+                                lastCount = 0;
+                            }
+                            else
+                                lastCount = count;
+                        }
                     }
                     builder.Append(candidate);
                 }
@@ -134,36 +157,54 @@ namespace System.Threading.Tasks
 
         #endregion // Format
 
-        #region HandleExceptionFlow
+        #region FormaStack
 
         /// <summary>
-        /// Recursive formatting
+        /// Format the call stack
         /// </summary>
         /// <param name="exception">The exception.</param>
-        /// <returns>
-        /// Build it in reverse format
-        /// </returns>
-        private static List<string> FormarRec(Exception exception)
+        /// <returns></returns>
+        private static List<string> FormaStack(Exception exception)
         {
-            var stackDetails = new List<string>();
             var aggregate = exception as AggregateException;
             if (aggregate != null)
             {
+                var stackDetails = new List<string>();
                 var exceptions = aggregate.Flatten().InnerExceptions;
                 if (exceptions.Count != 1)
                 {
                     int count = 1;
                     foreach (var ex in exceptions)
                     {
-                        List<string> tmp = FormarRec(ex);
+                        List<string> tmp = ReBuildStack(ex);
                         stackDetails.Add($"\r\n ~ {count++} ~> ({ex?.GetType()?.Name}) Reason = {ex?.GetBaseException()?.Message}\r\n");
                         stackDetails.AddRange(tmp);
                     }
+                    stackDetails.Add(Environment.NewLine);
+                    List<string> origin = ReBuildStack(exception);
+                    int startTaskIndex = origin.IndexOf(START_TASK_TAG);
+                    if (startTaskIndex == -1)
+                    {
+                        startTaskIndex = 0;
+                         stackDetails.Add(START_ASYNC_TAG);
+                    }
+                    stackDetails.AddRange(origin.Skip(startTaskIndex));
                     return stackDetails;
                 }
-                exception = exceptions[0];
+                exception = exceptions[0]; // single aggregate exception can unwrapped
             }
 
+            var stack = ReBuildStack(exception);
+            return stack;
+        }
+
+        #endregion // FormaStack
+
+        #region ReBuildStack
+
+        private static List<string> ReBuildStack(Exception exception, string indent = "")
+        {
+            var stackDetails = new List<string>();
             while (exception != null)
             {
                 var mtd = exception.TargetSite as MethodInfo;
@@ -171,9 +212,9 @@ namespace System.Threading.Tasks
                 {
                     #region Add Full Exception Details
 
-                    stackDetails.Add("\r\n-----------------------------\r\n");
-                    stackDetails.Add(exception.ToString());
-                    stackDetails.Add("\r\n-----------------------------\r\n");
+                    stackDetails.Add($"\r\n{indent}-----------------------------\r\n");
+                    stackDetails.Add($"{indent}{exception}");
+                    stackDetails.Add($"\r\n{indent}-----------------------------\r\n");
 
                     #endregion // Add Full Exception Details
                     break;
@@ -183,14 +224,17 @@ namespace System.Threading.Tasks
 
                 #region tmp.Add("# Throw (exception)")
 
-                string message = string.Empty;
-                using (var reader = new StringReader(exception.Message))
+                if (!(exception is AggregateException))
                 {
-                    message = reader.ReadLine();
-                    if (message.Length > MAX_LEN_OF_INNER_SNAP_LINE)
-                        message = message.Substring(0, MAX_LEN_OF_INNER_SNAP_LINE) + " ...";
+                    string message = string.Empty;
+                    using (var reader = new StringReader(exception.Message))
+                    {
+                        message = reader.ReadLine();
+                        if (message.Length > MAX_LEN_OF_INNER_SNAP_LINE)
+                            message = message.Substring(0, MAX_LEN_OF_INNER_SNAP_LINE) + " ...";
+                    }
+                    tmp.Add($"{indent}{THROW_PREFIX} ({exception?.GetType()?.Name}): {message}\r\n");
                 }
-                tmp.Add($"{THROW_PREFIX} ({exception?.GetType()?.Name}): {message}\r\n");
 
                 #endregion // tmp.Add("# Throw (exception)")
 
@@ -210,53 +254,62 @@ namespace System.Threading.Tasks
 
                         #endregion // Validation
 
+                        #region Case: ThreadStart
+
                         if (line.StartsWith("at System.Threading.ThreadHelper.ThreadStart()"))
                         {
-                            tmp.Add("\tStart Thread:");
+                            tmp.Add($"{indent} ~ Start Thread ~>\r\n");
                             continue;
                         }
+
+                        #endregion // Case: ThreadStart
+
+                        #region Clean up MoveNext and other async patterns
+
                         var m = ASYNC_REGEX1.Match(line);
                         if (m?.Success ?? false)
                         {
-                            string data = $"\t{m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
+                            string data = $"{indent}\t{m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
                             tmp.Add(data);
                             continue;
                         }
                         m = ASYNC_REGEX2.Match(line);
                         if (m?.Success ?? false)
                         {
-                            string data = $"\tanonymous: {m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
+                            string data = $"{indent}\tanonymous: {m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
                             tmp.Add(data);
                             continue;
                         }
                         m = ASYNC_REGEX3.Match(line);
                         if (m?.Success ?? false)
                         {
-                            string data = $"\t{m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
+                            string data = $"{indent}\t{m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
                             tmp.Add(data);
                             continue;
                         }
                         m = ASYNC_REGEX4.Match(line);
                         if (m?.Success ?? false)
                         {
-                            string data = $"\tanonymous: {m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
+                            string data = $"{indent}\tanonymous: {m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
                             tmp.Add(data);
                             continue;
                         }
                         m = ASYNC_REGEX5.Match(line);
                         if (m?.Success ?? false)
                         {
-                            tmp.Add("\tStart Task: ");
+                            tmp.Add($"{indent}{START_TASK_TAG}");
                             continue;
                         }
                         m = SYNC_REGEX.Match(line);
                         if (m?.Success ?? false)
                         {
                             string data = m.Groups?[1]?.Value ?? "Missing";
-                            tmp.Add($"\t{data} ->\r\n");
+                            tmp.Add($"{indent}\t{data} ->\r\n");
                             continue;
                         }
-                        tmp.Add($"\t{line}\r\n");
+                        tmp.Add($"{indent}\t{line}\r\n");
+
+                        #endregion // Clean up MoveNext and other async patterns
                     }
                 }
 
@@ -275,10 +328,11 @@ namespace System.Threading.Tasks
                 stackDetails.InsertRange(0, tmp);
                 exception = exception.InnerException;
             }
+
             return stackDetails;
         }
 
-        #endregion // HandleExceptionFlow
+        #endregion // ReBuildStack
 
         // TODO: keep \r\n\t
         #region HideDuplicatePaths
@@ -289,22 +343,27 @@ namespace System.Threading.Tasks
         /// <param name="src">The source.</param>
         /// <param name="dest">The destination.</param>
         /// <param name="replaceWith">The replacement char.</param>
-        /// <returns></returns>
-        public static string HideDuplicatePaths(string src, string dest, char replaceWith = '-')
+        /// <returns>the new string and the count of parts which was replaced</returns>
+        public static (string Candidate, int Count) HideDuplicatePaths(string src, string dest, char replaceWith = '-')
         {
-            int len = 0;
+            var pathBuilder = new StringBuilder();
             string[] dests = dest.Split('.');
+            string replacement = replaceWith.ToString();
+            int count = 0;
             foreach (var d in dests)
             {
                 string search = d + ".";
+                int len = pathBuilder.Length;
                 int index = src.IndexOf(search, len);
                 if (index != len)
                     break;
-                len = index + search.Length;
+                string part = CHAR_OR_NUMERIC.Replace(search, replacement);
+                pathBuilder.Append(part);
+                count++;
             }
-            if (len == 0)
-                return dest;
-            return dest.Substring(len).PadLeft(dest.Length, replaceWith);
+            if (pathBuilder.Length == 0)
+                return (dest, 0);
+            return ($"{pathBuilder}{dest.Substring(pathBuilder.Length)}", count);
         }
 
         #endregion // HideDuplicatePaths
