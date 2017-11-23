@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
@@ -85,6 +86,65 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #endregion // FormattingException_WhenAllFlow_HaveAllStackInOrder_Test
 
+        #region FormattingException_DashFormat_HaveAllStackInOrder_Test
+
+        [TestMethod]
+        public async Task FormattingException_DashFormat_HaveAllStackInOrder_Test()
+        {
+            try
+            {
+                await Step1Async(10);
+            }
+            catch (Exception ex)
+            {
+                var formatted = ex.Format(ErrorFormattingOption.DotForDuplicate);
+                int idx0 = formatted.IndexOf(nameof(FormattingException_DashFormat_HaveAllStackInOrder_Test));
+                Assert.AreNotEqual(-1, idx0);
+                int idx1 = formatted.IndexOf(nameof(Step1Async));
+                Assert.AreNotEqual(-1, idx1);
+                Assert.IsTrue(idx1 < idx0);
+                int idx2 = formatted.IndexOf(nameof(Step2Async));
+                Assert.AreNotEqual(-1, idx2);
+                Assert.IsTrue(idx2 < idx1);
+                int idx3 = formatted.IndexOf(nameof(OtherClass.Step3Async));
+                Assert.AreNotEqual(-1, idx3);
+                Assert.IsTrue(idx3 < idx2);
+                int idx4 = formatted.IndexOf(nameof(OtherClass.Step4Async));
+                Assert.AreNotEqual(-1, idx4);
+                Assert.IsTrue(idx4 < idx3);
+                int idx5 = formatted.IndexOf(nameof(OtherClass.Step5Async));
+                Assert.AreNotEqual(-1, idx5);
+                Assert.IsTrue(idx5 < idx4);
+
+                // check duplication
+                int idx4x = formatted.IndexOf(nameof(OtherClass.Step4Async), idx4+ 2);
+                Assert.AreEqual(-1, idx4x);
+            }
+
+        }
+
+        #endregion // FormattingException_DashFormat_HaveAllStackInOrder_Test
+
+        [TestMethod]
+        public async Task HideDuplicatePaths_MainScenario_Test()
+        {
+            string a = "aaa.bbb.ccc.eee";
+            string b = "aaa.bbb.ddd.ff";
+            string c = BnayaErrorHandlinglExtensions.HideDuplicatePaths(a, b);
+
+            Assert.AreEqual("--------ddd.ff", c);
+        }
+
+        //[TestMethod]
+        //public async Task HideDuplicatePaths_KeepTab_Test()
+        //{
+        //    string a = "\taaa.bbb.ccc.eee";
+        //    string b = "\taaa.bbb.ddd.ff";
+        //    string c = BnayaErrorHandlinglExtensions.HideDuplicatePaths(a, b);
+
+        //    Assert.AreEqual("--------ddd.ff", c);
+        //}
+
         #region Call-Chain
 
         #region Step1Async
@@ -116,7 +176,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
         #endregion // Step2Async
 
 
-        private class OtherClass
+        private static class OtherClass
         {
             #region Step3Async
 
@@ -172,11 +232,11 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region StepBAsync
 
-        private static async Task StepBAsync(DateTime dt)
+        private static Task StepBAsync(DateTime dt)
         {
             var t1 = Task.Run(() => throw new ArgumentException("Other Error"));
             var t2 = Step1Async(dt.Second);
-            await Task.WhenAll(t1, t2).ThrowAll();
+            return Task.WhenAll(t1, t2).ThrowAll();
         }
 
         #endregion // StepBAsync

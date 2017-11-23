@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+
+[assembly: InternalsVisibleTo("Bnaya.CSharp.AsyncExtensions.Tests")]
 
 namespace System.Threading.Tasks
 {
@@ -14,6 +17,7 @@ namespace System.Threading.Tasks
     public static class BnayaErrorHandlinglExtensions
     {
         private const int MAX_LEN_OF_INNER_SNAP_LINE = 50;
+        private const string THROW_PREFIX = "  # Throw";
         //private static readonly Regex ASYNC_REGEX = new Regex(@"\.(.*)\.<(.*)>d__"); // .{group 0 - any}.<{group 1 = any}>d__
         // "^\s*at = start with 'at ' optional preceding whitespace 
         // (.*\)) = group any until ')'
@@ -42,6 +46,8 @@ namespace System.Threading.Tasks
 
         #region Format
 
+        #region Overloads
+
         /// <summary>
         /// Simplify the exception.
         /// </summary>
@@ -51,6 +57,25 @@ namespace System.Threading.Tasks
         public static string Format(
                 this Exception exception,
                 bool includeFullUnformatedDetails = false)
+        {
+            return Format(exception, ErrorFormattingOption.Default, includeFullUnformatedDetails);
+        }
+
+        #endregion // Overloads
+
+        /// <summary>
+        /// Simplify the exception.
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        /// <param name="option">Formatting option.</param>
+        /// <param name="includeFullUnformatedDetails">if set to <c>true</c> [include exception.ToString()].</param>
+        /// <param name="replaceWith">The replacement char.</param>
+        /// <returns></returns>
+        internal static string Format(
+                this Exception exception,
+                ErrorFormattingOption option,
+                bool includeFullUnformatedDetails = false,
+                char replaceWith = '-')
         {
             if (exception == null)
                 return string.Empty;
@@ -77,14 +102,20 @@ namespace System.Threading.Tasks
 
                 builder.AppendLine("Formatted Stacks");
                 List<string> keep = FormarRec(exception);
+                string prev = null;
                 for (int i = 0; i < keep.Count; i++)
                 {
-                    // TODO: Cleanup duplication (namespace / class name)
                     // TODO: try to capture the parameters
-                    string prev = string.Empty;
-                    if (i > 0)
-                        prev = keep[i - 1];
-                    builder.Append(keep[i]);
+                    string candidate = keep[i];
+                    string origin = candidate;
+                    if (option == ErrorFormattingOption.DotForDuplicate && 
+                        !origin.StartsWith(THROW_PREFIX))
+                    {
+                        if (prev != null)
+                            candidate = HideDuplicatePaths(prev, candidate, replaceWith);
+                        prev = origin;
+                    }
+                    builder.Append(candidate);
                 }
 
                 if (includeFullUnformatedDetails)
@@ -109,7 +140,9 @@ namespace System.Threading.Tasks
         /// Recursive formatting
         /// </summary>
         /// <param name="exception">The exception.</param>
-        /// <returns>Build it in reverse format</returns>
+        /// <returns>
+        /// Build it in reverse format
+        /// </returns>
         private static List<string> FormarRec(Exception exception)
         {
             var stackDetails = new List<string>();
@@ -157,7 +190,7 @@ namespace System.Threading.Tasks
                     if (message.Length > MAX_LEN_OF_INNER_SNAP_LINE)
                         message = message.Substring(0, MAX_LEN_OF_INNER_SNAP_LINE) + " ...";
                 }
-                tmp.Add($"  # Throw ({exception?.GetType()?.Name}): {message}\r\n");
+                tmp.Add($"{THROW_PREFIX} ({exception?.GetType()?.Name}): {message}\r\n");
 
                 #endregion // tmp.Add("# Throw (exception)")
 
@@ -246,6 +279,36 @@ namespace System.Threading.Tasks
         }
 
         #endregion // HandleExceptionFlow
+
+        // TODO: keep \r\n\t
+        #region HideDuplicatePaths
+
+        /// <summary>
+        /// Dashes the compare.
+        /// </summary>
+        /// <param name="src">The source.</param>
+        /// <param name="dest">The destination.</param>
+        /// <param name="replaceWith">The replacement char.</param>
+        /// <returns></returns>
+        public static string HideDuplicatePaths(string src, string dest, char replaceWith = '-')
+        {
+            int len = 0;
+            string[] dests = dest.Split('.');
+            foreach (var d in dests)
+            {
+                string search = d + ".";
+                int index = src.IndexOf(search, len);
+                if (index != len)
+                    break;
+                len = index + search.Length;
+            }
+            if (len == 0)
+                return dest;
+            return dest.Substring(len).PadLeft(dest.Length, replaceWith);
+        }
+
+        #endregion // HideDuplicatePaths
+
     }
 }
 
