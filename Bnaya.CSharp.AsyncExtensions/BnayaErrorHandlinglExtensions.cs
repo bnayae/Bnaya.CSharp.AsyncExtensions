@@ -18,7 +18,7 @@ namespace System.Threading.Tasks
     {
         private const int MAX_LEN_OF_INNER_SNAP_LINE = 50;
         private const string THROW_PREFIX = "  # Throw";
-        private const string START_TASK_TAG = " ~ Start Task ~>\r\n";
+        private const string START_TASK_TAG = " ~ Start Task ~>";
         private const string START_ASYNC_TAG = " ~ Start ~>\r\n";
         //private static readonly Regex ASYNC_REGEX = new Regex(@"\.(.*)\.<(.*)>d__"); // .{group 0 - any}.<{group 1 = any}>d__
         // "^\s*at = start with 'at ' optional preceding whitespace 
@@ -50,6 +50,7 @@ namespace System.Threading.Tasks
                 "at System.Threading.Tasks.Task.ThrowIfExceptional",
                 "at System.Threading.Tasks.Task.Wait",
                 "at System.Threading.Tasks.Parallel.ForWorker",
+                "at System.Threading.Tasks.Task.ExecuteWithThreadLocal",
             };
 
         private static readonly Regex CHAR_OR_NUMERIC = new Regex(@"[\w|\d]"); // char or digit  
@@ -68,7 +69,7 @@ namespace System.Threading.Tasks
                 this Exception exception,
                 bool includeFullUnformatedDetails = false)
         {
-            return Format(exception, ErrorFormattingOption.Default, includeFullUnformatedDetails);
+            return Format(exception, ErrorFormattingOption.FormatDuplication, includeFullUnformatedDetails);
         }
 
         #endregion // Overloads
@@ -81,7 +82,7 @@ namespace System.Threading.Tasks
         /// <param name="includeFullUnformatedDetails">if set to <c>true</c> [include exception.ToString()].</param>
         /// <param name="replaceWith">The replacement char.</param>
         /// <returns></returns>
-        internal static string Format(
+        public static string Format(
                 this Exception exception,
                 ErrorFormattingOption option,
                 bool includeFullUnformatedDetails = false,
@@ -297,7 +298,7 @@ namespace System.Threading.Tasks
                         m = ASYNC_REGEX5.Match(line);
                         if (m?.Success ?? false)
                         {
-                            tmp.Add($"{indent}{START_TASK_TAG}");
+                            tmp.Add($"{indent}\t{START_TASK_TAG}\r\n");
                             continue;
                         }
                         m = SYNC_REGEX.Match(line);

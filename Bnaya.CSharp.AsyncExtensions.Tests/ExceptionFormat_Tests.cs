@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Linq;
 
+// TODO: New Thread, Task.Factory.StartNew, Task.Run
+
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
     [TestClass]
