@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
@@ -11,6 +12,7 @@ namespace System.Threading.Tasks
     public sealed class LockScope : IDisposable
     {
         private SemaphoreSlim _gate;
+        private AsyncLock _keepAlive;
 
         #region Ctor
 
@@ -19,10 +21,14 @@ namespace System.Threading.Tasks
         /// </summary>
         /// <param name="gate">The gate.</param>
         /// <param name="acquired">if set to <c>true</c> [acquired].</param>
-        internal LockScope(SemaphoreSlim gate, bool acquired)
+        internal LockScope(
+            SemaphoreSlim gate,
+            bool acquired,
+            AsyncLock keepAlive /* keep alive - avoid disposal */)
         {
             _gate = gate;
             Acquired = acquired;
+            _keepAlive = keepAlive;
         }
 
         #endregion // Ctor
@@ -46,9 +52,10 @@ namespace System.Threading.Tasks
         {
             if (_gate == null)
                 throw new ObjectDisposedException("Dispose can be invoked once");
-            if(Acquired)
+            if (Acquired)
                 _gate?.Release();
             _gate = null;
+            _keepAlive = null;
             GC.SuppressFinalize(this);
         }
 

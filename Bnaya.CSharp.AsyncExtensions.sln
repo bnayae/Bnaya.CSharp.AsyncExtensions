@@ -1,11 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bnaya.CSharp.AsyncExtensions", "Bnaya.CSharp.AsyncExtensions\Bnaya.CSharp.AsyncExtensions.csproj", "{AE366E33-765A-412B-B73D-E0B91DC02E8A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bnaya.CSharp.AsyncExtensions.Tests", "Bnaya.CSharp.AsyncExtensions.Tests\Bnaya.CSharp.AsyncExtensions.Tests.csproj", "{49FAC379-9B9D-41E8-9B00-A9C9F7165A12}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bnaya.CSharp.RxExtensions", "Bnaya.CSharp.RxExtensions\Bnaya.CSharp.RxExtensions.csproj", "{24482D3F-65B1-42A7-ABD6-FC53E072EE0A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bnaya.CSharp.CollectionExtensions", "Bnaya.CSharp.CollectionExtensions\Bnaya.CSharp.CollectionExtensions.csproj", "{33846813-C795-4386-9537-73FBA8A0D2E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A14C2086-5FDA-4212-869B-061DFD908C07}"
+	ProjectSection(SolutionItems) = preProject
+		Ideas.txt = Ideas.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +30,14 @@ Global
 		{49FAC379-9B9D-41E8-9B00-A9C9F7165A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49FAC379-9B9D-41E8-9B00-A9C9F7165A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49FAC379-9B9D-41E8-9B00-A9C9F7165A12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24482D3F-65B1-42A7-ABD6-FC53E072EE0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24482D3F-65B1-42A7-ABD6-FC53E072EE0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24482D3F-65B1-42A7-ABD6-FC53E072EE0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24482D3F-65B1-42A7-ABD6-FC53E072EE0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33846813-C795-4386-9537-73FBA8A0D2E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33846813-C795-4386-9537-73FBA8A0D2E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33846813-C795-4386-9537-73FBA8A0D2E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33846813-C795-4386-9537-73FBA8A0D2E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

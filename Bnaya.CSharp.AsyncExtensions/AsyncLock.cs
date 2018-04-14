@@ -1,4 +1,6 @@
 ﻿
+using System.Diagnostics;
+
 namespace System.Threading.Tasks
 {
     /// <summary>
@@ -9,6 +11,7 @@ namespace System.Threading.Tasks
     {
         private readonly SemaphoreSlim _gate;
         private readonly TimeSpan _defaultTimeout;
+        private readonly bool _ownTheGate;
 
         #region Ctor
 
@@ -24,6 +27,7 @@ namespace System.Threading.Tasks
         public AsyncLock(TimeSpan defaultTimeout, ushort gateLimit = 1)
         {
             _gate = new SemaphoreSlim(gateLimit);
+            _ownTheGate = true;
             _defaultTimeout = defaultTimeout;
         }
 
@@ -36,6 +40,7 @@ namespace System.Threading.Tasks
         public AsyncLock(SemaphoreSlim gate, TimeSpan defaultTimeout)
         {
             _gate = gate;
+            _ownTheGate = false;
             _defaultTimeout = defaultTimeout;
         }
 
@@ -53,7 +58,7 @@ namespace System.Threading.Tasks
         {
             var timeout = overrideTimeout == default(TimeSpan) ? _defaultTimeout : overrideTimeout;
             bool acquired = await _gate.WaitAsync(timeout).ConfigureAwait(false);            
-            return new LockScope(_gate, acquired);
+            return new LockScope(_gate, acquired, this /* keep alive - avoid disposal */);
         }
 
         #endregion // TryAcquireAsync
@@ -87,14 +92,18 @@ namespace System.Threading.Tasks
         /// </summary>
         public void Dispose()
         {
-            _gate?.Dispose();
+            if(_ownTheGate)
+                _gate?.Dispose();
             GC.SuppressFinalize(this);
         }
 
         /// <summary>
         /// Finalizes an instance of the <see cref="AsyncLock"/> class.
         /// </summary>
-        ~AsyncLock() => Dispose();
+        ~AsyncLock()
+        {
+            Dispose();
+        }
 
         #endregion // Dispose Pattern
     }

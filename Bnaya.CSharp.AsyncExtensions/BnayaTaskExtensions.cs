@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -109,8 +110,12 @@ namespace System.Threading.Tasks
         /// </summary>
         /// <param name="initTask">The initialize task.</param>
         /// <param name="duration">The duration.</param>
-        /// <returns></returns>
+        /// <returns>
+        /// true: when timeout.
+        /// false: when complete before the timeout.
+        /// </returns>
         [DebuggerNonUserCode]
+        [Obsolete("Bug fix on version 1.0.17: the return value on previous version returns true when not timeout (should return true when timeout)", false)]
         public static async Task<bool> IsTimeoutAsync(
             this Task initTask, 
             TimeSpan duration)
@@ -119,12 +124,12 @@ namespace System.Threading.Tasks
             Task deadlockDetection = await Task.WhenAny(initTask, delay).ConfigureAwait(false);
             if (deadlockDetection == delay)
             {
-                return false;
+                return true;
             }
             else
             {
                 await initTask.ConfigureAwait(false);
-                return true;
+                return false;
             }
         }
 
@@ -182,6 +187,7 @@ namespace System.Threading.Tasks
         //[DebuggerHidden]
         [DebuggerNonUserCode]
         [DebuggerStepThrough]
+        [Obsolete("CancellationToken.Register become weak, no need for this method, will be deleted next version", false)]
         public static CancellationTokenRegistration RegisterWeak(
             this CancellationToken cancellation,
             Action action)
@@ -204,6 +210,7 @@ namespace System.Threading.Tasks
         //[DebuggerHidden]
         [DebuggerNonUserCode]
         [DebuggerStepThrough]
+        [Obsolete("CancellationToken.Register become weak, no need for this method, will be deleted next version", false)]
         public static CancellationTokenRegistration RegisterWeak(
             this CancellationToken cancellation,
             Action<object> action,
@@ -262,5 +269,96 @@ namespace System.Threading.Tasks
         }
 
         #endregion // ThrowAll
+
+        #region ToValueTask
+
+        /// <summary>
+        /// Convert any object to value task.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
+        public static ValueTask<T> ToValueTask<T>(this T value) =>
+            new ValueTask<T>(value);
+
+        #endregion // ToValueTask
+
+        #region WhenN
+
+        /// <summary>
+        /// Whens the n.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tasks">The tasks.</param>
+        /// <param name="threshold">The threshold.</param>
+        /// <param name="condition">The condition.</param>
+        /// <param name="cancellation">The cancellation id handle
+        /// which enable will be set to cancel
+        /// when completed tasks (which pass the condition)
+        /// reach the threshold.
+        /// It's enable the original tasks to listen on its cancellation token.</param>
+        /// <param name="whenAllCompleteAction">
+        /// Triggered when all the tasks completed, 
+        /// This is useful for disposal logic.
+        /// </param>
+        /// <returns>
+        /// The item's order (within the result) is the order of the task completions.
+        /// first completed task's result is the first item in the array.
+        /// Succeed: indicate whether completed tasks
+        /// (which pass the condition) reach the threshold.
+        /// </returns>
+        public static async Task<(T[] Results, bool Succeed)> WhenN<T>(
+            this Task<T>[] tasks,
+            int threshold,
+            Func<T, bool> condition = null,
+            CancellationTokenSource cancellation = null,
+            Action<T[]> whenAllCompleteAction = null)
+        {
+            // use for signal completion
+            var completionEvent = new TaskCompletionSource<object>();
+            var queue = new ConcurrentQueue<T>();
+
+            Task<T[]> allTasks = Task.WhenAll(tasks);
+            foreach (var task in tasks)
+            {
+                Task fireForget = EvalueateSingleTask(task);
+            }
+            Task anyTask = await Task.WhenAny(
+                                    completionEvent.Task, // Succeed
+                                    allTasks) // Passing tasks below threshold
+                                    .ConfigureAwait(false); 
+            if (whenAllCompleteAction != null)
+            {
+                Task cleanup = allTasks
+                    .ContinueWith(c =>  whenAllCompleteAction(c.Result));
+            }
+
+            bool succeed = anyTask == completionEvent.Task;
+            T[] response = queue.ToArray();
+            return (response, succeed);
+
+            #region EvalueateSingleTask (local method)
+
+            async Task EvalueateSingleTask(Task<T> task)
+            {
+                if (cancellation.IsCancellationRequested)
+                    return;
+                T result = await task;
+                if (condition?.Invoke(result) ?? true)
+                {
+                    queue.Enqueue(result);
+                    if (queue.Count >= threshold)
+                    {
+                        cancellation?.CancelSafe();
+                        completionEvent.TrySetResult(null);
+                    }
+                }
+            }
+
+            #endregion // EvalueateSingleTask (local method)
+        }
+
+
+        #endregion // WhenN
     }
 }
