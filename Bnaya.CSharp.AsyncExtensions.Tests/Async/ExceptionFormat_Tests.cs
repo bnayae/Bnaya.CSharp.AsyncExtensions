@@ -209,7 +209,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
         #region HideDuplicatePaths_Shorter_Test
 
         [TestMethod]
-        public async Task HideDuplicatePaths_Shorter_Test()
+        public void HideDuplicatePaths_Shorter_Test()
         {
             string a = "aaa1.bbb2.ccc3.eee4";
             string b = "aaa1.bbb2.ddd3.ff4";
@@ -223,7 +223,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
         #region HideDuplicatePaths_Longer_Test
 
         [TestMethod]
-        public async Task HideDuplicatePaths_Longer_Test()
+        public void HideDuplicatePaths_Longer_Test()
         {
             string a = "aaa1.bbb2.ccc3.eee4";
             string b = "aaa1.bbb2.ddd3.ffff4";
@@ -238,7 +238,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
         #region HideDuplicatePaths_StartKeepTab_Test
 
         [TestMethod]
-        public async Task HideDuplicatePaths_StartKeepTab_Test()
+        public void HideDuplicatePaths_StartKeepTab_Test()
         {
             string a = "\taaa1.bbb2.ccc3.eee4";
             string b = "\taaa1.bbb2.ddd3.ff4";
@@ -252,7 +252,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
         #region HideDuplicatePaths_KeepTab_Test
 
         [TestMethod]
-        public async Task HideDuplicatePaths_KeepTab_Test()
+        public void HideDuplicatePaths_KeepTab_Test()
         {
             string a = "\taaa1.\tbbb2.ccc3.eee4";
             string b = "\taaa1.\tbbb2.\tddd3.ff4";
