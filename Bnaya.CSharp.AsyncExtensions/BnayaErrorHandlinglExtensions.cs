@@ -27,7 +27,7 @@ namespace System.Threading.Tasks
 
         private static readonly Regex EXCLUDE = new Regex(@"[\W|_]"); // not char, digit  
         private static readonly Regex EXCLUDE_FROM_START = new Regex(@"^[\W|_]"); // not start with char, digit  
-        private static readonly Regex ASYNC_REGEX1 = new Regex(@"^\s*at\s+(?<namespace>[\w|\.]+)\<(?<method>\w+)\>d__[0-9]+.MoveNext\(\)\sin"); // at {nameespace}<{method}>d__##.MoveNext() in
+        private static readonly Regex ASYNC_REGEX1 = new Regex(@"^\s*at\s+(?<namespace>[\w|\.]+)\<(?<method>\w+)\>d__[0-9]+.MoveNext\(\)\sin\s(?<file>.*):(?<loc>line\s.*)"); // at {nameespace}<{method}>d__##.MoveNext() in
         private static readonly Regex ASYNC_REGEX2 = new Regex(@"^\s*at\s+(?<namespace>[\w|\.]+)\<\>c\.\<\<(?<method>\w+)\>b__[0-9|_]+\>d\.MoveNext\(\)\s+in"); // at {namespace}<>c.<<{method}>b__##_##>d.MoveNext() in
         private static readonly Regex ASYNC_REGEX3 = new Regex(@"^\s*at\s+(?<namespace>[\w|\.]+)\<\>c__DisplayClass[0-9|_]+\.\<\<(?<method>\w+)\>b__[0-9]+\>d\.MoveNext\(\)"); // at {namespace}<>c__DisplayClass##_##.<<{method}>b__##>d.MoveNext()
         private static readonly Regex ASYNC_REGEX4 = new Regex(@"^\s*at\s+(?<namespace>[\w|\.]+)\<\>c\.\<(?<method>\w+)\>b__[0-9|_]+\(\)"); // at {namespace}<>c.<{method}>b__##_##() in
@@ -55,7 +55,7 @@ namespace System.Threading.Tasks
 
         private static readonly Regex CHAR_OR_NUMERIC = new Regex(@"[\w|\d]"); // char or digit  
 
-        #region Format
+        #region Format / FormatWithLineNumber
 
         #region Overloads
 
@@ -67,9 +67,16 @@ namespace System.Threading.Tasks
         /// <returns></returns>
         public static string Format(
                 this Exception exception,
+                bool includeFullUnformatedDetails = false,
+                bool withLineNumber = false)
+        {
+            return Format(exception, ErrorFormattingOption.FormatDuplication, includeFullUnformatedDetails, withLineNumber: withLineNumber);
+        }
+        public static string FormatWithLineNumber(
+                this Exception exception,
                 bool includeFullUnformatedDetails = false)
         {
-            return Format(exception, ErrorFormattingOption.FormatDuplication, includeFullUnformatedDetails);
+            return Format(exception, ErrorFormattingOption.FormatDuplication, includeFullUnformatedDetails, withLineNumber: true);
         }
 
         #endregion // Overloads
@@ -86,7 +93,8 @@ namespace System.Threading.Tasks
                 this Exception exception,
                 ErrorFormattingOption option,
                 bool includeFullUnformatedDetails = false,
-                char replaceWith = '-')
+                char replaceWith = '-',
+                bool withLineNumber = false)
         {
             if (exception == null)
                 return string.Empty;
@@ -112,7 +120,7 @@ namespace System.Threading.Tasks
                 }
 
                 builder.AppendLine("Formatted Stacks");
-                List<string> keep = FormaStack(exception);
+                List<string> keep = FormaStack(exception, withLineNumber);
                 string prev = null;
                 int lastCount = 0;
                 for (int i = 0; i < keep.Count; i++)
@@ -122,8 +130,8 @@ namespace System.Threading.Tasks
                     string origin = candidate;
                     if (option == ErrorFormattingOption.FormatDuplication)
                     {
-                        if (origin.StartsWith(THROW_PREFIX)) 
-                           prev = null;
+                        if (origin.StartsWith(THROW_PREFIX))
+                            prev = null;
                         else
                         {
                             int count = 0;
@@ -156,7 +164,7 @@ namespace System.Threading.Tasks
             }
         }
 
-        #endregion // Format
+        #endregion // Format / FormatWithLineNumber
 
         #region FormaStack
 
@@ -165,7 +173,9 @@ namespace System.Threading.Tasks
         /// </summary>
         /// <param name="exception">The exception.</param>
         /// <returns></returns>
-        private static List<string> FormaStack(Exception exception)
+        private static List<string> FormaStack(
+            Exception exception,
+            bool withLineNumber)
         {
             var aggregate = exception as AggregateException;
             if (aggregate != null)
@@ -187,7 +197,7 @@ namespace System.Threading.Tasks
                     if (startTaskIndex == -1)
                     {
                         startTaskIndex = 0;
-                         stackDetails.Add(START_ASYNC_TAG);
+                        stackDetails.Add(START_ASYNC_TAG);
                     }
                     stackDetails.AddRange(origin.Skip(startTaskIndex));
                     return stackDetails;
@@ -195,7 +205,7 @@ namespace System.Threading.Tasks
                 exception = exceptions[0]; // single aggregate exception can unwrapped
             }
 
-            var stack = ReBuildStack(exception);
+            var stack = ReBuildStack(exception, string.Empty, withLineNumber);
             return stack;
         }
 
@@ -203,7 +213,10 @@ namespace System.Threading.Tasks
 
         #region ReBuildStack
 
-        private static List<string> ReBuildStack(Exception exception, string indent = "")
+        private static List<string> ReBuildStack(
+            Exception exception,
+            string indent = "",
+            bool withLineNumber = false)
         {
             var stackDetails = new List<string>();
             while (exception != null)
@@ -270,7 +283,16 @@ namespace System.Threading.Tasks
                         var m = ASYNC_REGEX1.Match(line);
                         if (m?.Success ?? false)
                         {
-                            string data = $"{indent}\t{m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?) ->\r\n";
+                            string at = string.Empty;
+                            if (withLineNumber)
+                            {
+                                string file = m.Groups?["file"]?.Value;
+                                if (file != null)
+                                    file = Path.GetFileName(file);
+                                string loc = m.Groups?["loc"]?.Value;
+                                at = $" at {file} {loc}";
+                            }
+                            string data = $"{indent}\t{m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?){at} ->\r\n";
                             tmp.Add(data);
                             continue;
                         }
@@ -316,10 +338,11 @@ namespace System.Threading.Tasks
 
                 #region Remove Duplicate Stack
 
-                if (tmp.Count != 0)
+                if (!withLineNumber && tmp.Count != 0)
                 {
                     var fst = stackDetails.Skip(1).FirstOrDefault();
                     var lst = tmp[tmp.Count - 1];
+
                     if (fst != null && fst == lst)
                         tmp.Remove(fst);
                 }

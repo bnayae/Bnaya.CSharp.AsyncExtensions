@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Bnaya.CSharp.AsyncExtensions</AssemblyName>
     <RootNamespace>Bnaya.CSharp.AsyncExtensions</RootNamespace>
-    <Version>1.0.18</Version>
+    <Version>1.0.19</Version>
     <Description>Useful extensions contribution by Bnaya Eshet
 Blog: http://blogs.microsoft.co.il/bnaya/
 
@@ -36,19 +36,24 @@ Install-Package Bnaya.CSharp.AsyncExtensions
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</Description>
     <Copyright>Bnaya Eshet ©</Copyright>
     <PackageTags>async, Parallel, await, task, timeout, deadlock, cancel, cancellation, bnaya</PackageTags>
-    <PackageReleaseNotes>Release 1.0.18 (Has Breaking Changes):
+    <PackageReleaseNotes>Release 1.0.19
+Features
+- Exception.FormatWithLineNumber
+
+Release 1.0.18 (Has Breaking Changes):
 Feature:
 - WhenN: use to complete task aftern n task succeed
 BUG FIX:
 - Breaking changes: IsTimeoutAsync_Test (on versions below 1.0.17)
   wes returning false when timeout detected and true when when timeout not detected
-- AcquireAsync and TryAcquireAsync (object disposal race)</PackageReleaseNotes>
+- AcquireAsync and TryAcquireAsync (object disposal race)
+</PackageReleaseNotes>
     <PackageProjectUrl>http://blogs.microsoft.co.il/bnaya/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bnayae/Bnaya.CSharp.AsyncExtensions</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageIconUrl>https://github.com/bnayae/BeyondAsyncAwait/blob/master/20.%20Cool%20Extensions/async-ex.png?raw=true</PackageIconUrl>
-    <AssemblyVersion>1.0.18.0</AssemblyVersion>
-    <FileVersion>1.0.18.0</FileVersion>
+    <AssemblyVersion>1.0.19.0</AssemblyVersion>
+    <FileVersion>1.0.19.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
