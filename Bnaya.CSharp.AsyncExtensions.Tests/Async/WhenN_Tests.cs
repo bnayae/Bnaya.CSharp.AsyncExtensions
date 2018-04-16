@@ -9,10 +9,10 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
     [TestClass]
     public class WhenN_Tests
     {
-        #region WhenN_Test
+        #region WhenN_OfT_Test
 
         [TestMethod]
-        public async Task WhenN_Test()
+        public async Task WhenN_OfT_Test()
         {
             // arrange
             var disposed = new ManualResetEventSlim(false);
@@ -58,12 +58,12 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             }
         }
 
-        #endregion // WhenN_Test
+        #endregion // WhenN_OfT_Test
 
-        #region WhenN_NoCondition_Test
+        #region WhenN_OfT_NoCondition_Test
 
         [TestMethod]
-        public async Task WhenN_NoCondition_Test()
+        public async Task WhenN_OfT_NoCondition_Test()
         {
             // arrange
             var disposed = new ManualResetEventSlim(false);
@@ -108,12 +108,12 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             }
         }
 
-        #endregion // WhenN_NoCondition_Test
+        #endregion // WhenN_OfT_NoCondition_Test
 
-        #region WhenN_NotSucceed_Test
+        #region WhenN_OfT_NotSucceed_Test
 
         [TestMethod]
-        public async Task WhenN_NotSucceed_Test()
+        public async Task WhenN_OfT_NotSucceed_Test()
         {
             // arrange
             var sw = Stopwatch.StartNew();
@@ -159,5 +159,43 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
         }
 
         #endregion // WhenN_NotSucceed_Test
+
+        #region WhenN_Test
+
+        [TestMethod]
+        public async Task WhenN_Test()
+        {
+            // arrange
+            var disposed = new ManualResetEventSlim(false);
+            var sw = Stopwatch.StartNew();
+            Task[] tasks =
+                    {
+                        Task.Delay(TimeSpan.FromMilliseconds(1)),
+                        Task.Delay(TimeSpan.FromMilliseconds(50)),
+                        Task.Delay(TimeSpan.FromMilliseconds(100)),
+                        Task.Delay(TimeSpan.FromMilliseconds(200))
+                    };
+            var cancellation = new CancellationTokenSource();
+
+            // act
+            await tasks.WhenN(2, cancellation,
+                              DisposeCancellation);
+
+            // assert
+            sw.Stop();
+            TimeSpan duration = sw.Elapsed;
+            Assert.IsTrue(cancellation.IsCancellationRequested, "Cancellation");
+            Assert.IsTrue(duration >= TimeSpan.FromMilliseconds(50) &&
+                          duration < TimeSpan.FromSeconds(10), "Duration");
+            Assert.IsTrue(disposed.Wait(500), "DisposeCancellation");
+
+            void DisposeCancellation()
+            {
+                cancellation.Dispose();
+                disposed.Set();
+            }
+        }
+
+        #endregion // WhenN_Test
     }
 }

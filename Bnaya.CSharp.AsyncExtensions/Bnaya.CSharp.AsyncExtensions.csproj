@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Bnaya.CSharp.AsyncExtensions</AssemblyName>
     <RootNamespace>Bnaya.CSharp.AsyncExtensions</RootNamespace>
-    <Version>1.0.19</Version>
+    <Version>1.0.20</Version>
     <Description>Useful extensions contribution by Bnaya Eshet
 Blog: http://blogs.microsoft.co.il/bnaya/
 
@@ -52,8 +52,8 @@ BUG FIX:
     <RepositoryUrl>https://github.com/bnayae/Bnaya.CSharp.AsyncExtensions</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageIconUrl>https://github.com/bnayae/BeyondAsyncAwait/blob/master/20.%20Cool%20Extensions/async-ex.png?raw=true</PackageIconUrl>
-    <AssemblyVersion>1.0.19.0</AssemblyVersion>
-    <FileVersion>1.0.19.0</FileVersion>
+    <AssemblyVersion>1.0.20.0</AssemblyVersion>
+    <FileVersion>1.0.20.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
