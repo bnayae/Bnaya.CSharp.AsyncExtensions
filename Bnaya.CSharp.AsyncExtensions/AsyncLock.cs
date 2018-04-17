@@ -106,5 +106,20 @@ namespace System.Threading.Tasks
         }
 
         #endregion // Dispose Pattern
+
+        #region EmptyDisposal
+
+        /// <summary>
+        /// Empty Disposal
+        /// </summary>
+        /// <seealso cref="System.IDisposable" />
+        private class EmptyDisposal : IDisposable
+        {
+            public static readonly IDisposable Default = new EmptyDisposal();
+            private EmptyDisposal() {}
+            public void Dispose() {}
+        }
+
+        #endregion // EmptyDisposal
     }
 }

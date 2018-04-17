@@ -15,7 +15,7 @@ namespace System.Threading.Tasks
     {
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(15);
 
-        #region Try/LockAsync
+        #region Try/AcquireAsync
 
         /// <summary>
         /// Try to acquire async lock,
@@ -49,7 +49,7 @@ namespace System.Threading.Tasks
             return locker.AcquireAsync();
         }
 
-        #endregion // Try/LockAsync
+        #endregion // Try/AcquireAsync
 
         #region WithTimeout
 
@@ -178,7 +178,7 @@ namespace System.Threading.Tasks
 
         #endregion // WithCancellation
 
-        #region RegisterWeak
+        #region [Deprecated] RegisterWeak
 
         /// <summary>
         /// Weak registration for cancellation token.
@@ -227,7 +227,7 @@ namespace System.Threading.Tasks
             return cancellation.Register(tmp, state);
         }
 
-        #endregion // RegisterWeak
+        #endregion // [Deprecated] RegisterWeak
 
         #region ThrowAll
 
@@ -285,12 +285,47 @@ namespace System.Threading.Tasks
 
         #endregion // ToValueTask
 
+        #region When
+
+        /// <summary>
+        /// Return task which complete pass condition and return first
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tasks">The tasks.</param>
+        /// <param name="condition">The condition.</param>
+        /// <param name="cancellation">The cancellation id handle
+        /// which enable will be set to cancel
+        /// when completed tasks (which pass the condition)
+        /// reach the threshold.
+        /// It's enable the original tasks to listen on its cancellation token.</param>
+        /// <param name="whenAllCompleteAction">Triggered when all the tasks completed,
+        /// This is useful for disposal logic.</param>
+        /// <returns>
+        /// The item's order (within the result) is the order of the task completions.
+        /// first completed task's result is the first item in the array.
+        /// Succeed: indicate whether completed tasks
+        /// (which pass the condition) reach the threshold.
+        /// </returns>
+        public static async Task<(T Result, bool Succeed)> When<T>(
+            this IEnumerable<Task<T>> tasks,
+            Func<T, bool> condition,
+            CancellationTokenSource cancellation = null,
+            Action<T[]> whenAllCompleteAction = null)
+        {
+            (T[] items, bool succeed) = await WhenN(tasks, 1, condition, cancellation, whenAllCompleteAction);
+            if(succeed)
+                return (items.FirstOrDefault(), succeed);
+            return (default(T), succeed);
+        }
+
+        #endregion // When
+
         #region WhenN
 
         #region Overloads
 
         /// <summary>
-        /// Whens the n.
+        /// Return task which complete when completed tasks cross the threshold
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="tasks">The tasks.</param>
@@ -321,7 +356,7 @@ namespace System.Threading.Tasks
         }
 
         /// <summary>
-        /// Whens the n.
+        /// Return task which complete when completed tasks (that pass condition) cross the threshold
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="tasks">The tasks.</param>
@@ -355,7 +390,7 @@ namespace System.Threading.Tasks
         #endregion // Overloads
 
         /// <summary>
-        /// Whens the n.
+        /// Return task which complete when completed tasks (that pass condition) cross the threshold
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="tasks">The tasks.</param>
@@ -410,7 +445,7 @@ namespace System.Threading.Tasks
 
             async Task EvalueateSingleTask(Task<T> task)
             {
-                if (cancellation.IsCancellationRequested)
+                if (cancellation?.IsCancellationRequested ?? false)
                     return;
                 T result = await task;
                 if (condition?.Invoke(result) ?? true)
@@ -428,7 +463,7 @@ namespace System.Threading.Tasks
         }
 
         /// <summary>
-        /// Whens the n.
+        /// Return task which complete when completed tasks cross the threshold
         /// </summary>
         /// <param name="tasks">The tasks.</param>
         /// <param name="threshold">The threshold.</param>
@@ -465,13 +500,11 @@ namespace System.Threading.Tasks
                     .ContinueWith(c => whenAllCompleteAction());
             }
 
-            bool succeed = anyTask == completionEvent.Task;
-
             #region EvalueateSingleTask (local method)
 
             async Task EvalueateSingleTask(Task task)
             {
-                if (cancellation.IsCancellationRequested)
+                if (cancellation?.IsCancellationRequested ?? false)
                     return;
                 await task;
                 int count = Interlocked.Increment(ref completeCount);
