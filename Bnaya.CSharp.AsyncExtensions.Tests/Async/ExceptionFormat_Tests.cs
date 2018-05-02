@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Linq;
+using static System.Threading.Tasks.ErrorFormattingOption;
 
 // TODO: New Thread, Task.Factory.StartNew, Task.Run
 
@@ -23,7 +24,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             }
             catch (Exception ex)
             {
-                var formatted = ex.Format();
+                var formatted = ex.Format(None);
                 int idx0 = formatted.IndexOf(nameof(FormattingException_HaveAllStackInOrder_Test));
                 Assert.AreNotEqual(-1, idx0);
                 int idx1 = formatted.IndexOf(nameof(Step1Async));

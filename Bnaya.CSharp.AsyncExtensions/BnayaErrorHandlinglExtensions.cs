@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.Threading.Tasks.ErrorFormattingOption;
 
 [assembly: InternalsVisibleTo("Bnaya.CSharp.AsyncExtensions.Tests")]
 
@@ -64,19 +65,54 @@ namespace System.Threading.Tasks
         /// </summary>
         /// <param name="exception">The exception.</param>
         /// <param name="includeFullUnformatedDetails">if set to <c>true</c> [include exception.ToString()].</param>
-        /// <returns></returns>
+        /// <param name="withLineNumber">if set to <c>true</c> [with line number].</param>
+        /// <returns>Formatted exception details</returns>
+        [Obsolete("deprecated: will be remove on future versions, Use ErrorFormattingOption for example:  Format with ErrorFormattingOption for example:  Format(ErrorFormattingOption.IncludeLineNumber | ErrorFormattingOption.IncludeFullUnformattedDetails | ErrorFormattingOption.FormatDuplication)")]
         public static string Format(
                 this Exception exception,
-                bool includeFullUnformatedDetails = false,
-                bool withLineNumber = false)
+                bool includeFullUnformatedDetails,
+                bool withLineNumber)
         {
             return Format(exception, ErrorFormattingOption.FormatDuplication, includeFullUnformatedDetails, withLineNumber: withLineNumber);
         }
+        /// <summary>
+        /// Simplify the exception.
+        /// Formats the with line number.
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        /// <param name="includeFullUnformatedDetails">if set to <c>true</c> [include full unformated details].</param>
+        /// <returns>Formatted exception details</returns>
+        [Obsolete("deprecated: will be remove on future versions, Use Format with ErrorFormattingOption for example:  Format(ErrorFormattingOption.IncludeLineNumber | ErrorFormattingOption.IncludeFullUnformattedDetails | ErrorFormattingOption.FormatDuplication)")]
         public static string FormatWithLineNumber(
                 this Exception exception,
                 bool includeFullUnformatedDetails = false)
         {
             return Format(exception, ErrorFormattingOption.FormatDuplication, includeFullUnformatedDetails, withLineNumber: true);
+        }
+
+        /// <summary>
+        /// Simplify the exception.
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        /// <param name="option">Formatting option.</param>
+        /// <param name="includeFullUnformatedDetails">if set to <c>true</c> [include exception.ToString()].</param>
+        /// <param name="replaceWith">The replacement char.</param>
+        /// <param name="withLineNumber">if set to <c>true</c> [with line number].</param>
+        /// <returns>Formatted exception details</returns>
+        [Obsolete("deprecated: will be remove on future versions, Use ErrorFormattingOption for example:  Format with ErrorFormattingOption for example:  Format(ErrorFormattingOption.IncludeLineNumber | ErrorFormattingOption.IncludeFullUnformattedDetails | ErrorFormattingOption.FormatDuplication)")]
+        public static string Format(
+                this Exception exception,
+                ErrorFormattingOption option,
+                bool includeFullUnformatedDetails,
+                char replaceWith = '-',
+                bool withLineNumber = false)
+        {
+            if (includeFullUnformatedDetails)
+                option |= ErrorFormattingOption.IncludeFullUnformattedDetails;
+            if (withLineNumber)
+                option |= ErrorFormattingOption.IncludeLineNumber;
+
+            return Format(exception, option, replaceWith);
         }
 
         #endregion // Overloads
@@ -86,15 +122,12 @@ namespace System.Threading.Tasks
         /// </summary>
         /// <param name="exception">The exception.</param>
         /// <param name="option">Formatting option.</param>
-        /// <param name="includeFullUnformatedDetails">if set to <c>true</c> [include exception.ToString()].</param>
         /// <param name="replaceWith">The replacement char.</param>
-        /// <returns></returns>
+        /// <returns>Formatted exception details</returns>
         public static string Format(
                 this Exception exception,
-                ErrorFormattingOption option,
-                bool includeFullUnformatedDetails = false,
-                char replaceWith = '-',
-                bool withLineNumber = false)
+                ErrorFormattingOption option = Default,
+                char replaceWith = '-')
         {
             if (exception == null)
                 return string.Empty;
@@ -120,7 +153,8 @@ namespace System.Threading.Tasks
                 }
 
                 builder.AppendLine("Formatted Stacks");
-                List<string> keep = FormaStack(exception, withLineNumber);
+                bool includeLineNumber = (option & IncludeLineNumber) != None;
+                List<string> keep = FormaStack(exception, includeLineNumber);
                 string prev = null;
                 int lastCount = 0;
                 for (int i = 0; i < keep.Count; i++)
@@ -128,7 +162,7 @@ namespace System.Threading.Tasks
                     // TODO: try to capture the parameters
                     string candidate = keep[i];
                     string origin = candidate;
-                    if (option == ErrorFormattingOption.FormatDuplication)
+                    if ((option & FormatDuplication) != None)
                     {
                         if (origin.StartsWith(THROW_PREFIX))
                             prev = null;
@@ -150,7 +184,7 @@ namespace System.Threading.Tasks
                     builder.Append(candidate);
                 }
 
-                if (includeFullUnformatedDetails)
+                if ((option & IncludeFullUnformattedDetails) !=  None)
                 {
                     builder.AppendLine("====================== FULL INFORMATION ============================");
                     builder.AppendLine(exception.ToString());
@@ -213,6 +247,7 @@ namespace System.Threading.Tasks
 
         #region ReBuildStack
 
+#pragma warning disable MS002 // Cyclomatic Complexity does not follow metric rules.
         private static List<string> ReBuildStack(
             Exception exception,
             string indent = "",
@@ -355,10 +390,10 @@ namespace System.Threading.Tasks
 
             return stackDetails;
         }
+#pragma warning restore MS002 // Cyclomatic Complexity does not follow metric rules.
 
         #endregion // ReBuildStack
 
-        // TODO: keep \r\n\t
         #region HideDuplicatePaths
 
         /// <summary>
@@ -391,7 +426,6 @@ namespace System.Threading.Tasks
         }
 
         #endregion // HideDuplicatePaths
-
     }
 }
 
