@@ -85,13 +85,14 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             using (LockScope scope = await locker.TryAcquireAsync(TimeSpan.FromSeconds(5)))
             {
                 Assert.IsTrue(scope.Acquired);
-                var sw = Stopwatch.StartNew();
                 fireForget = Task.Run(async () =>
                 {
+                    var sw = Stopwatch.StartNew();
                     using (LockScope scopeInner = await locker.TryAcquireAsync(TimeSpan.FromMilliseconds(50)))
                     {
                         sw.Stop();
-                        Assert.IsTrue(sw.ElapsedMilliseconds >= 50, $"sw.ElapsedMilliseconds >= 50, Actual = {sw.ElapsedMilliseconds}");
+                        // 48: timer may not be so accurate
+                        Assert.IsTrue(sw.ElapsedMilliseconds >= 48, $"sw.ElapsedMilliseconds >= 50, Actual = {sw.ElapsedMilliseconds}");
                         Assert.IsFalse(scopeInner.Acquired, "scopeInner.Acquired");
                     }
                 });

@@ -116,8 +116,10 @@ namespace System.Threading.Tasks
         private class EmptyDisposal : IDisposable
         {
             public static readonly IDisposable Default = new EmptyDisposal();
-            private EmptyDisposal() {}
-            public void Dispose() {}
+#pragma warning disable MS003 
+            private EmptyDisposal() { }
+            public void Dispose() { }
+#pragma warning restore MS003 // Lines of Code does not follow metric rules.
         }
 
         #endregion // EmptyDisposal

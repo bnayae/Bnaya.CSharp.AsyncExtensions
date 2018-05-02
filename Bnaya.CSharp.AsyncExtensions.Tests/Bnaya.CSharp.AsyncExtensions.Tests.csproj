@@ -61,6 +61,7 @@
     <Compile Include="Async\ValueTask_Tests.cs" />
     <Compile Include="Async\WhenN_Tests.cs" />
     <Compile Include="Async\WithTimeout_Tests.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Task-Like\TaskLikeMethodBuilder.cs" />
     <Compile Include="Task-Like\ConfiguredTaskLikeAwaitable.cs" />

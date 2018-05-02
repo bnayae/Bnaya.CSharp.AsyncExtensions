@@ -114,7 +114,7 @@ public sealed class WeakEvent<T> : IDisposable
 
 
     /// <summary>
-    /// Finalizes an instance of the <see cref="WeakEvent" /> class.
+    /// Finalizes an instance.
     /// </summary>
     ~WeakEvent()
     {
@@ -137,10 +137,11 @@ public sealed class WeakEvent<T> : IDisposable
     {
         #region Ctor
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EquatableWeakReference`1"/> class.
-        /// </summary>
-        /// <param name="target">The object to track or null.</param>
+#pragma warning disable MS003 // Lines of Code does not follow metric rules.
+                             /// <summary>
+                             /// Initializes a new instance of the <see cref="EquatableWeakReference`1"/> class.
+                             /// </summary>
+                             /// <param name="target">The object to track or null.</param>
         public EquatableWeakReference(object target) : base(target)
         {
         }
@@ -162,6 +163,7 @@ public sealed class WeakEvent<T> : IDisposable
         protected EquatableWeakReference(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
         {
         }
+#pragma warning restore MS003 // Lines of Code does not follow metric rules.
 
         #endregion // Ctor
 

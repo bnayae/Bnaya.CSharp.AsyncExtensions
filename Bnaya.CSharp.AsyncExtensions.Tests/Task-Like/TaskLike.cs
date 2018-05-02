@@ -190,18 +190,18 @@ namespace System.Threading.Tasks
         /// </returns>
         public override string ToString()
         {
+#pragma warning disable RCS1165 // Unconstrained type parameter checked for null.
             if (_task != null)
             {
-                return _task.Status == TaskStatus.RanToCompletion && _task.Result != null ?
-                    _task.Result.ToString() :
-                    string.Empty;
+                if(_task.Status == TaskStatus.RanToCompletion)
+                    return _task.Result.ToString() ?? string.Empty;
+                return string.Empty;
             }
             else
             {
-                return _result != null ?
-                    _result.ToString() :
-                    string.Empty;
+                return _result?.ToString() ?? string.Empty;
             }
+#pragma warning restore RCS1165 // Unconstrained type parameter checked for null.
         }
 
         #endregion // ToString
@@ -216,10 +216,11 @@ namespace System.Threading.Tasks
         /// </returns>
         public override int GetHashCode()
         {
-            return
+ #pragma warning disable RECS0098 // Finds redundant null coalescing expressions such as expr ?? expr
+           return
                 _task != null ? _task.GetHashCode() :
-                _result != null ? _result.GetHashCode() :
-                0;
+                                _result?.GetHashCode() ?? 0;
+#pragma warning restore RECS0098 // Finds redundant null coalescing expressions such as expr ?? expr
         }
 
         /// <summary>

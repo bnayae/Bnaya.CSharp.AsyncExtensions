@@ -298,24 +298,20 @@ namespace System.Threading.Tasks
         /// when completed tasks (which pass the condition)
         /// reach the threshold.
         /// It's enable the original tasks to listen on its cancellation token.</param>
-        /// <param name="whenAllCompleteAction">Triggered when all the tasks completed,
-        /// This is useful for disposal logic.</param>
         /// <returns>
-        /// The item's order (within the result) is the order of the task completions.
-        /// first completed task's result is the first item in the array.
-        /// Succeed: indicate whether completed tasks
+        /// The result of the task which pass the condition (in case that it didn't succeed, return default).
+        /// Succeed: indicate whether completed task
         /// (which pass the condition) reach the threshold.
         /// </returns>
-        public static async Task<(T Result, bool Succeed)> When<T>(
+        public static async Task<(T Result, bool Succeed, Task<T[]> All)> When<T>(
             this IEnumerable<Task<T>> tasks,
             Func<T, bool> condition,
-            CancellationTokenSource cancellation = null,
-            Action<T[]> whenAllCompleteAction = null)
+            CancellationTokenSource cancellation = null)
         {
-            (T[] items, bool succeed) = await WhenN(tasks, 1, condition, cancellation, whenAllCompleteAction);
+            (T[] items, bool succeed, Task<T[]> all) = await WhenN(tasks, 1, condition, cancellation);
             if(succeed)
-                return (items.FirstOrDefault(), succeed);
-            return (default(T), succeed);
+                return (items.FirstOrDefault(), succeed, all);
+            return (default(T), succeed, all);
         }
 
         #endregion // When
@@ -327,32 +323,23 @@ namespace System.Threading.Tasks
         /// <summary>
         /// Return task which complete when completed tasks cross the threshold
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="tasks">The tasks.</param>
         /// <param name="threshold">The threshold.</param>
-        /// <param name="condition">The condition.</param>
         /// <param name="cancellation">The cancellation id handle
         /// which enable will be set to cancel
         /// when completed tasks (which pass the condition)
         /// reach the threshold.
         /// It's enable the original tasks to listen on its cancellation token.</param>
-        /// <param name="whenAllCompleteAction">
-        /// Triggered when all the tasks completed, 
-        /// This is useful for disposal logic.
-        /// </param>
         /// <returns>
-        /// The item's order (within the result) is the order of the task completions.
-        /// first completed task's result is the first item in the array.
-        /// Succeed: indicate whether completed tasks
-        /// (which pass the condition) reach the threshold.
+        /// Outer Task represent the completion of N Tasks.
+        /// Inner Task represent the completion of all Tasks
         /// </returns>
-        public static Task WhenN(
+        public static Task<Task> WhenN(
             this IEnumerable<Task> tasks,
             int threshold,
-            CancellationTokenSource cancellation = null,
-            Action whenAllCompleteAction = null)
+            CancellationTokenSource cancellation = null)
         {
-            return WhenN(tasks.ToArray(), threshold, cancellation, whenAllCompleteAction);
+            return WhenN(tasks.ToArray(), threshold, cancellation);
         }
 
         /// <summary>
@@ -367,24 +354,20 @@ namespace System.Threading.Tasks
         /// when completed tasks (which pass the condition)
         /// reach the threshold.
         /// It's enable the original tasks to listen on its cancellation token.</param>
-        /// <param name="whenAllCompleteAction">
-        /// Triggered when all the tasks completed, 
-        /// This is useful for disposal logic.
-        /// </param>
         /// <returns>
-        /// The item's order (within the result) is the order of the task completions.
+        /// Results: ordered by completions,
         /// first completed task's result is the first item in the array.
         /// Succeed: indicate whether completed tasks
         /// (which pass the condition) reach the threshold.
+        /// All: indication of all completed tasks.
         /// </returns>
-        public static Task<(T[] Results, bool Succeed)> WhenN<T>(
+        public static Task<(T[] Results, bool Succeed, Task<T[]> All)> WhenN<T>(
             this IEnumerable<Task<T>> tasks,
             int threshold,
             Func<T, bool> condition = null,
-            CancellationTokenSource cancellation = null,
-            Action<T[]> whenAllCompleteAction = null)
+            CancellationTokenSource cancellation = null)
         {
-            return WhenN(tasks.ToArray(), threshold, condition, cancellation, whenAllCompleteAction);
+            return WhenN(tasks.ToArray(), threshold, condition, cancellation);
         }
 
         #endregion // Overloads
@@ -401,22 +384,18 @@ namespace System.Threading.Tasks
         /// when completed tasks (which pass the condition)
         /// reach the threshold.
         /// It's enable the original tasks to listen on its cancellation token.</param>
-        /// <param name="whenAllCompleteAction">
-        /// Triggered when all the tasks completed, 
-        /// This is useful for disposal logic.
-        /// </param>
         /// <returns>
-        /// The item's order (within the result) is the order of the task completions.
+        /// Results: ordered by completions,
         /// first completed task's result is the first item in the array.
         /// Succeed: indicate whether completed tasks
         /// (which pass the condition) reach the threshold.
+        /// All: indication of all completed tasks.
         /// </returns>
-        public static async Task<(T[] Results, bool Succeed)> WhenN<T>(
+        public static async Task<(T[] Results, bool Succeed, Task<T[]> All)> WhenN<T>(
             this Task<T>[] tasks,
             int threshold,
             Func<T, bool> condition = null,
-            CancellationTokenSource cancellation = null,
-            Action<T[]> whenAllCompleteAction = null)
+            CancellationTokenSource cancellation = null)
         {
             // use for signal completion
             var completionEvent = new TaskCompletionSource<object>();
@@ -431,15 +410,10 @@ namespace System.Threading.Tasks
                                     completionEvent.Task, // Succeed
                                     allTasks) // Passing tasks below threshold
                                     .ConfigureAwait(false);
-            if (whenAllCompleteAction != null)
-            {
-                Task cleanup = allTasks
-                    .ContinueWith(c => whenAllCompleteAction(c.Result));
-            }
 
             bool succeed = anyTask == completionEvent.Task;
             T[] response = queue.ToArray();
-            return (response, succeed);
+            return (response, succeed, allTasks);
 
             #region EvalueateSingleTask (local method)
 
@@ -471,15 +445,14 @@ namespace System.Threading.Tasks
         /// which enable will be set to cancel
         /// when completed tasks reach the threshold.
         /// It's enable the original tasks to listen on its cancellation token.</param>
-        /// <param name="whenAllCompleteAction">Triggered when all the tasks completed,
-        /// This is useful for disposal logic.</param>
         /// <returns>
+        /// Outer Task represent the completion of N Tasks.
+        /// Inner Task represent the completion of all Tasks
         /// </returns>
-        public static async Task WhenN(
+        public static async Task<Task> WhenN(
             this Task[] tasks,
             int threshold,
-            CancellationTokenSource cancellation = null,
-            Action whenAllCompleteAction = null)
+            CancellationTokenSource cancellation = null)
         {
             // use for signal completion
             var completionEvent = new TaskCompletionSource<object>();
@@ -494,11 +467,8 @@ namespace System.Threading.Tasks
                                     completionEvent.Task, // Succeed
                                     allTasks) // Passing tasks below threshold
                                     .ConfigureAwait(false);
-            if (whenAllCompleteAction != null)
-            {
-                Task cleanup = allTasks
-                    .ContinueWith(c => whenAllCompleteAction());
-            }
+
+            return allTasks;
 
             #region EvalueateSingleTask (local method)
 

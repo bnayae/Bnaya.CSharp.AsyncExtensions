@@ -117,13 +117,14 @@ namespace System.Threading.Tasks
 
         #endregion // Overloads
 
-        /// <summary>
-        /// Simplify the exception.
-        /// </summary>
-        /// <param name="exception">The exception.</param>
-        /// <param name="option">Formatting option.</param>
-        /// <param name="replaceWith">The replacement char.</param>
-        /// <returns>Formatted exception details</returns>
+#pragma warning disable MS002 // Cyclomatic Complexity does not follow metric rules.
+                             /// <summary>
+                             /// Simplify the exception.
+                             /// </summary>
+                             /// <param name="exception">The exception.</param>
+                             /// <param name="option">Formatting option.</param>
+                             /// <param name="replaceWith">The replacement char.</param>
+                             /// <returns>Formatted exception details</returns>
         public static string Format(
                 this Exception exception,
                 ErrorFormattingOption option = Default,
@@ -164,7 +165,7 @@ namespace System.Threading.Tasks
                     string origin = candidate;
                     if ((option & FormatDuplication) != None)
                     {
-                        if (origin.StartsWith(THROW_PREFIX))
+                        if (origin.StartsWith(THROW_PREFIX, StringComparison.Ordinal))
                             prev = null;
                         else
                         {
@@ -197,6 +198,7 @@ namespace System.Threading.Tasks
                 return exception.ToString();
             }
         }
+#pragma warning restore MS002 // Cyclomatic Complexity does not follow metric rules.
 
         #endregion // Format / FormatWithLineNumber
 
@@ -298,14 +300,14 @@ namespace System.Threading.Tasks
 
                         #region Validation
 
-                        if (IGNORE_START_WITH.Any(ignore => line.StartsWith(ignore)))
+                        if (IGNORE_START_WITH.Any(ignore => line.StartsWith(ignore, StringComparison.Ordinal)))
                             continue;
 
                         #endregion // Validation
 
                         #region Case: ThreadStart
 
-                        if (line.StartsWith("at System.Threading.ThreadHelper.ThreadStart()"))
+                        if (line.StartsWith("at System.Threading.ThreadHelper.ThreadStart()", StringComparison.Ordinal))
                         {
                             tmp.Add($"{indent} ~ Start Thread ~>\r\n");
                             continue;
@@ -413,7 +415,7 @@ namespace System.Threading.Tasks
             {
                 string search = d + ".";
                 int len = pathBuilder.Length;
-                int index = src.IndexOf(search, len);
+                int index = src.IndexOf(search, len, StringComparison.Ordinal);
                 if (index != len)
                     break;
                 string part = CHAR_OR_NUMERIC.Replace(search, replacement);

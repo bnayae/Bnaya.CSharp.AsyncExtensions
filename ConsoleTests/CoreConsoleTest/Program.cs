@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace CoreConsoleTest
 {
-    class Program
+    static class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             #region CompleteWhenN
 

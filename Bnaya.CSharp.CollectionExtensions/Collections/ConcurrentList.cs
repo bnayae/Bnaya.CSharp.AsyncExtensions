@@ -8,7 +8,7 @@ using System.Threading;
 namespace Bnaya.CSharp.AsyncExtensions.Collections
 {
     /// <summary>
-    /// 
+    /// Thread-safe List
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="System.Collections.Generic.IEnumerable{T}" />

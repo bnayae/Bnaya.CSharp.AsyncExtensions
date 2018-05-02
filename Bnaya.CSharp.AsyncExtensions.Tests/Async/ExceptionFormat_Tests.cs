@@ -25,26 +25,26 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             catch (Exception ex)
             {
                 var formatted = ex.Format(None);
-                int idx0 = formatted.IndexOf(nameof(FormattingException_HaveAllStackInOrder_Test));
+                int idx0 = formatted.IndexOf(nameof(FormattingException_HaveAllStackInOrder_Test), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx0);
-                int idx1 = formatted.IndexOf(nameof(Step1Async));
+                int idx1 = formatted.IndexOf(nameof(Step1Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx1);
                 Assert.IsTrue(idx1 < idx0);
-                int idx2 = formatted.IndexOf(nameof(Step2Async));
+                int idx2 = formatted.IndexOf(nameof(Step2Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx2);
                 Assert.IsTrue(idx2 < idx1);
-                int idx3 = formatted.IndexOf(nameof(OtherClass.Step3Async));
+                int idx3 = formatted.IndexOf(nameof(OtherClass.Step3Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx3);
                 Assert.IsTrue(idx3 < idx2);
-                int idx4 = formatted.IndexOf(nameof(OtherClass.Step4Async));
+                int idx4 = formatted.IndexOf(nameof(OtherClass.Step4Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx4);
                 Assert.IsTrue(idx4 < idx3);
-                int idx5 = formatted.IndexOf(nameof(OtherClass.Step5Async));
+                int idx5 = formatted.IndexOf(nameof(OtherClass.Step5Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx5);
                 Assert.IsTrue(idx5 < idx4);
 
                 // check duplication
-                int idx4x = formatted.IndexOf(nameof(OtherClass.Step4Async), idx4 + 2);
+                int idx4x = formatted.IndexOf(nameof(OtherClass.Step4Async), idx4 + 2, StringComparison.Ordinal);
                 Assert.AreEqual(-1, idx4x);
             }
 
@@ -63,33 +63,33 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             }
             catch (Exception ex)
             {
-                var formatted = ex.FormatWithLineNumber();
-                int idx0 = formatted.IndexOf(nameof(FormattingException_HaveAllStackInOrder_WithLocation_Test));
+                var formatted = ex.Format(ErrorFormattingOption.IncludeLineNumber);
+                int idx0 = formatted.IndexOf(nameof(FormattingException_HaveAllStackInOrder_WithLocation_Test), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx0);
-                int idx1 = formatted.IndexOf(nameof(Step1Async));
+                int idx1 = formatted.IndexOf(nameof(Step1Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx1);
                 Assert.IsTrue(idx1 < idx0);
-                int idx2 = formatted.IndexOf(nameof(Step2Async));
+                int idx2 = formatted.IndexOf(nameof(Step2Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx2);
                 Assert.IsTrue(idx2 < idx1);
-                int idx3 = formatted.IndexOf(nameof(OtherClass.Step3Async));
+                int idx3 = formatted.IndexOf(nameof(OtherClass.Step3Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx3);
                 Assert.IsTrue(idx3 < idx2);
-                int idx4 = formatted.IndexOf(nameof(OtherClass.Step4Async));
+                int idx4 = formatted.IndexOf(nameof(OtherClass.Step4Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx4);
                 Assert.IsTrue(idx4 < idx3);
-                int idx5 = formatted.IndexOf(nameof(OtherClass.Step5Async));
+                int idx5 = formatted.IndexOf(nameof(OtherClass.Step5Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx5);
                 Assert.IsTrue(idx5 < idx4);
 
                 // check duplication
-                int idx4x = formatted.IndexOf(nameof(OtherClass.Step4Async), idx4 + 2);
+                int idx4x = formatted.IndexOf(nameof(OtherClass.Step4Async), idx4 + 2, StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx4x, "includeLocation option don't remove duplication");
 
                 // check location
-                int idx6 = formatted.IndexOf(".cs");
+                int idx6 = formatted.IndexOf(".cs", StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx6);
-                int idx7 = formatted.IndexOf(" line ");
+                int idx7 = formatted.IndexOf(" line ", StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx7);
             }
 
@@ -111,26 +111,26 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 var formatted = ex.Format();
 
 
-                int idxArrow1 = formatted.IndexOf("~ 1 ~>");
-                int idxArrow2 = formatted.IndexOf("~ 2 ~>");
+                int idxArrow1 = formatted.IndexOf("~ 1 ~>", StringComparison.Ordinal);
+                int idxArrow2 = formatted.IndexOf("~ 2 ~>", StringComparison.Ordinal);
                 Assert.IsTrue(idxArrow1 < idxArrow2);
-                int idxA0 = formatted.IndexOf("# Throw (ArgumentException): Other Error");
+                int idxA0 = formatted.IndexOf("# Throw (ArgumentException): Other Error", StringComparison.Ordinal);
                 Assert.IsTrue(idxArrow1 < idxA0);
                 Assert.IsTrue(idxA0 < idxArrow2);
                 Assert.AreNotEqual(-1, idxA0);
-                int idxB = formatted.IndexOf(nameof(StepBAsync));
-                int idx1 = formatted.IndexOf(nameof(Step1Async));
+                int idxB = formatted.IndexOf(nameof(StepBAsync), StringComparison.Ordinal);
+                int idx1 = formatted.IndexOf(nameof(Step1Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx1);
                 Assert.IsTrue(idx1 > idxA0);
-                int idx2 = formatted.IndexOf(nameof(Step2Async));
+                int idx2 = formatted.IndexOf(nameof(Step2Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx2);
                 Assert.IsTrue(idx2 < idx1);
 
 
                 // check duplication
-                int idxStart = formatted.IndexOf("~ Start Task ~>");
-                int idxA = formatted.IndexOf(nameof(StepAAsync));
-                int idxTest = formatted.IndexOf(nameof(FormattingException_WhenAllFlow_HaveAllStackInOrder_Test));
+                int idxStart = formatted.IndexOf("~ Start Task ~>", StringComparison.Ordinal);
+                int idxA = formatted.IndexOf(nameof(StepAAsync), StringComparison.Ordinal);
+                int idxTest = formatted.IndexOf(nameof(FormattingException_WhenAllFlow_HaveAllStackInOrder_Test), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idxStart);
                 Assert.AreNotEqual(-1, idxA);
                 Assert.AreNotEqual(-1, idxTest);
@@ -153,9 +153,9 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             catch (Exception ex)
             {
                 var formatted = ex.Format();
-                int idx3 = formatted.IndexOf("~ 3 ~>");
-                int idxStart = formatted.IndexOf("~ Start Task ~>");
-                int idxFor = formatted.IndexOf("Parallel.For");
+                int idx3 = formatted.IndexOf("~ 3 ~>", StringComparison.Ordinal);
+                int idxStart = formatted.IndexOf("~ Start Task ~>", StringComparison.Ordinal);
+                int idxFor = formatted.IndexOf("Parallel.For", StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx3);
                 Assert.AreNotEqual(-1, idxStart);
                 Assert.AreNotEqual(-1, idxFor);
@@ -178,9 +178,9 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             catch (Exception ex)
             {
                 var formatted = ex.Format();
-                int idx3 = formatted.IndexOf("~ 2 ~>");
-                int idxStart = formatted.IndexOf("~ Start ~>");
-                int idxTest = formatted.IndexOf(nameof(FormattingException_Linq_HaveAllStackInOrder_Test));
+                int idx3 = formatted.IndexOf("~ 2 ~>", StringComparison.Ordinal);
+                int idxStart = formatted.IndexOf("~ Start ~>", StringComparison.Ordinal);
+                int idxTest = formatted.IndexOf(nameof(FormattingException_Linq_HaveAllStackInOrder_Test), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx3);
                 Assert.AreNotEqual(-1, idxStart);
                 Assert.AreNotEqual(-1, idxTest);
@@ -205,7 +205,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             {
                 var formatted = ex.Format(ErrorFormattingOption.FormatDuplication);
                 var lines = formatted.Split(new[] { '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                int replaced = lines.Where(l => l.StartsWith("-----.------.")).Count();
+                int replaced = lines.Where(l => l.StartsWith("-----.------.", StringComparison.Ordinal)).Count();
                 Assert.AreEqual(3, replaced);
             }
 
@@ -227,30 +227,27 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 var formatted = ex.Format(ErrorFormattingOption.FormatDuplication);
 
                 var lines = formatted.Split(new[] { '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                int replaced = lines.Where(l => l.StartsWith("-----.------.")).Count();
+                int replaced = lines.Where(l => l.StartsWith("-----.------.", StringComparison.Ordinal)).Count();
                 Assert.AreEqual(3, replaced);
 
-                int idxArrow1 = formatted.IndexOf("~ 1 ~>");
-                int idxArrow2 = formatted.IndexOf("~ 2 ~>");
+                int idxArrow1 = formatted.IndexOf("~ 1 ~>", StringComparison.Ordinal);
+                int idxArrow2 = formatted.IndexOf("~ 2 ~>", StringComparison.Ordinal);
                 Assert.IsTrue(idxArrow1 < idxArrow2);
-                int idxA0 = formatted.IndexOf("# Throw (ArgumentException): Other Error");
+                int idxA0 = formatted.IndexOf("# Throw (ArgumentException): Other Error", StringComparison.Ordinal);
                 Assert.IsTrue(idxArrow1 < idxA0);
                 Assert.IsTrue(idxA0 < idxArrow2);
                 Assert.AreNotEqual(-1, idxA0);
-                int idxB = formatted.IndexOf(nameof(StepBAsync));
-                int idx1 = formatted.IndexOf(nameof(Step1Async));
+                int idxB = formatted.IndexOf(nameof(StepBAsync), StringComparison.Ordinal);
+                int idx1 = formatted.IndexOf(nameof(Step1Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx1);
                 Assert.IsTrue(idx1 > idxA0);
-                int idx2 = formatted.IndexOf(nameof(Step2Async));
+                int idx2 = formatted.IndexOf(nameof(Step2Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx2);
                 Assert.IsTrue(idx2 < idx1);
-
             }
-
         }
 
         #endregion // FormattingException_WhenAllFlow_DashFormat_Test
-
 
         #region HideDuplicatePaths_Shorter_Test
 

@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Bnaya.CSharp.AsyncExtensions</AssemblyName>
     <RootNamespace>Bnaya.CSharp.AsyncExtensions</RootNamespace>
-    <Version>1.0.21</Version>
+    <Version>1.0.23</Version>
     <Description>Useful extensions contribution by Bnaya Eshet
 Blog: http://blogs.microsoft.co.il/bnaya/
 
@@ -36,7 +36,13 @@ Install-Package Bnaya.CSharp.AsyncExtensions
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</Description>
     <Copyright>Bnaya Eshet ©</Copyright>
     <PackageTags>async, Parallel, await, task, timeout, deadlock, cancel, cancellation, bnaya</PackageTags>
-    <PackageReleaseNotes>Release 1.0.21
+    <PackageReleaseNotes>Release 1.0.23 (Breaking Changes)
+When / WhenN signature changed (remove the all task Action in flavor of returning all tasks in the result)
+
+Release 1.0.22
+Refactor exception.Format
+
+Release 1.0.21
 BUG FIX
 - Async Lock
 Features
@@ -58,8 +64,8 @@ BUG FIX:
     <RepositoryUrl>https://github.com/bnayae/Bnaya.CSharp.AsyncExtensions</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageIconUrl>https://github.com/bnayae/BeyondAsyncAwait/blob/master/20.%20Cool%20Extensions/async-ex.png?raw=true</PackageIconUrl>
-    <AssemblyVersion>1.0.21.0</AssemblyVersion>
-    <FileVersion>1.0.21.0</FileVersion>
+    <AssemblyVersion>1.0.23.0</AssemblyVersion>
+    <FileVersion>1.0.23.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
