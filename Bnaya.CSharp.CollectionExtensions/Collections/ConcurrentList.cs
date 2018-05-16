@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 
@@ -12,6 +13,8 @@ namespace System.Collections.Concurrent
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="System.Collections.Generic.IEnumerable{T}" />
+    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerTypeProxy(typeof(ConcurrentList<>.DebugView))]
     public class ConcurrentList<T> : IList<T>
     {
         private ImmutableList<T> _items;
@@ -129,12 +132,20 @@ namespace System.Collections.Concurrent
         /// Adds the range.
         /// </summary>
         /// <param name="values">The values.</param>
+        /// <returns>
+        /// Immutable collection of the list state 
+        /// right after the operation took effect.
+        /// </returns>
         public ImmutableList<T> AddRange(params T[] values) => AddRange((IEnumerable<T>)values);
 
         /// <summary>
         /// Adds the range.
         /// </summary>
         /// <param name="values">The values.</param>
+        /// <returns>
+        /// Immutable collection of the list state 
+        /// right after the operation took effect.
+        /// </returns>
         public ImmutableList<T> AddRange(IEnumerable<T> values)
         {
             while (true)
@@ -162,6 +173,10 @@ namespace System.Collections.Concurrent
         /// </summary>
         /// <param name="index">The zero-based index at which item should be inserted.</param>
         /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1"></see>.</param>
+        /// <returns>
+        /// Immutable collection of the list state 
+        /// right after the operation took effect.
+        /// </returns>
         public ImmutableList<T> Insert(int index, T item)
         {
             while (true)
@@ -195,6 +210,10 @@ namespace System.Collections.Concurrent
         /// Removes the specified value.
         /// </summary>
         /// <param name="value">The value.</param>
+        /// <returns>
+        /// Immutable collection of the list state 
+        /// right after the operation took effect.
+        /// </returns>
         public ImmutableList<T> Remove(T value)
         {
             while (true)
@@ -206,6 +225,7 @@ namespace System.Collections.Concurrent
             }
         }
 
+
         #endregion // Remove
 
         #region RemoveRange
@@ -214,7 +234,20 @@ namespace System.Collections.Concurrent
         /// Removes the range.
         /// </summary>
         /// <param name="values">The values.</param>
-        public ImmutableList<T> RemoveRange(params T[] values)
+        /// <returns>
+        /// Immutable collection of the list state 
+        /// right after the operation took effect.
+        /// </returns>
+        public ImmutableList<T> RemoveRange(params T[] values) => RemoveRange((IEnumerable<T>)values);
+        /// <summary>
+        /// Removes the range.
+        /// </summary>
+        /// <param name="values">The values.</param>
+        /// <returns>
+        /// Immutable collection of the list state 
+        /// right after the operation took effect.
+        /// </returns>
+        public ImmutableList<T> RemoveRange(IEnumerable<T> values)
         {
             while (true)
             {
@@ -241,6 +274,10 @@ namespace System.Collections.Concurrent
         /// </summary>
         /// <param name="index">The zero-based index of the item to remove.</param>
         /// <exception cref="NotImplementedException"></exception>
+        /// <returns>
+        /// Immutable collection of the list state 
+        /// right after the operation took effect.
+        /// </returns>
         public ImmutableList<T> RemoveAt(int index)
         {
             while (true)
@@ -254,6 +291,32 @@ namespace System.Collections.Concurrent
 
         #endregion // RemoveAt
 
+        #region RemoveAll
+
+        /// <summary>
+        /// Removes items according to condition.
+        /// </summary>
+        /// <param name="condition">
+        /// The condition which should pass in order to remove the item.
+        /// </param>
+        /// <returns></returns>
+        /// <returns>
+        /// Immutable collection of the list state 
+        /// right after the operation took effect.
+        /// </returns>
+        public ImmutableList<T> RemoveAll(Predicate<T> condition)
+        {
+            while (true)
+            {
+                var itemsCheck = _items;
+                var candidate = itemsCheck.RemoveAll(condition);
+                if (TryAssign(itemsCheck, candidate))
+                    return candidate;
+            }
+        }
+
+        #endregion // RemoveAll
+
         #region Clear
 
         /// <summary>
@@ -264,6 +327,10 @@ namespace System.Collections.Concurrent
         /// <summary>
         /// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"></see>.
         /// </summary>
+        /// <returns>
+        /// Immutable collection of the list state 
+        /// right after the operation took effect.
+        /// </returns>
         public ImmutableList<T> Clear()
         {
             while (true)
@@ -296,8 +363,26 @@ namespace System.Collections.Concurrent
         /// </summary>
         /// <param name="array">The one-dimensional <see cref="T:System.Array"></see> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"></see>. The <see cref="T:System.Array"></see> must have zero-based indexing.</param>
         /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
-        public void CopyTo(T[] array, int arrayIndex) =>
-                            _items.CopyTo(array, arrayIndex);
+        void ICollection<T>.CopyTo(T[] array, int arrayIndex) => CopyTo(array, arrayIndex);
+
+        /// <summary>
+        /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"></see> to an <see cref="T:System.Array"></see>, starting at a particular <see cref="T:System.Array"></see> index.
+        /// </summary>
+        /// <param name="array">The one-dimensional <see cref="T:System.Array"></see> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"></see>. The <see cref="T:System.Array"></see> must have zero-based indexing.</param>
+        /// <param name="fromIndexOnDest">
+        /// The zero-based index on the destination array.
+        /// The data of the source array will be fully copied
+        /// into the destination, starts at the arrayIndex</param>
+        /// <returns>
+        /// Immutable collection of the list state 
+        /// which was copied to the array.
+        /// </returns>
+        public ImmutableList<T> CopyTo(T[] array, int fromIndexOnDest)
+        {
+            var snapshot = _items;
+            snapshot.CopyTo(array, fromIndexOnDest);
+            return snapshot;
+        }
 
         #endregion // CopyTo
 
@@ -328,7 +413,7 @@ namespace System.Collections.Concurrent
         /// <summary>
         /// Gets read-only (immutable) copy.
         /// </summary>
-        public IReadOnlyList<T> AsReadOnly => _items;
+        public IReadOnlyList<T> AsReadOnly() => _items;
 
         #endregion // AsReadOnly
 
@@ -369,5 +454,22 @@ namespace System.Collections.Concurrent
         }
 
         #endregion // TryAssign
+
+        #region DebugView
+
+        public class DebugView
+        {
+            private readonly ConcurrentList<T> _items;
+
+            public DebugView(ConcurrentList<T> items)
+            {
+                _items = items;
+            }
+
+            [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+            public ImmutableArray<T> items => _items.ToImmutableArray();
+        }
+
+        #endregion // DebugView
     }
 }
