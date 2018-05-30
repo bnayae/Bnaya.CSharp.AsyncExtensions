@@ -190,9 +190,11 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                         Task.Delay(TimeSpan.FromMilliseconds(200))
                     };
             // act
+#pragma warning disable AsyncFixer05 // Implicit casting from Task<Task> to Task or awaiting Task<Task>
             Task all = await tasks
                 .WhenN(threshold, cancellation)
                 .ConfigureAwait(false);
+#pragma warning restore AsyncFixer05 // Implicit casting from Task<Task> to Task or awaiting Task<Task>
 
             // assert
             sw.Stop();

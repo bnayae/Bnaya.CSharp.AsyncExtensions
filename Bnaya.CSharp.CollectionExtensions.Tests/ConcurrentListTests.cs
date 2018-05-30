@@ -15,9 +15,9 @@ namespace Bnaya.CSharp.CollectionExtensions.Tests
         private const int START_COUNT = 10;
         private const int RANGE_SIZE = 100;
 
-        private ConcurrentList<int> _unitUnderTest;
-        private ConcurrentList<int> _unitUnderTestEmpty = new ConcurrentList<int>();
-        private ConcurrentList<int> _unitUnderTestLarge;
+        private ConcurrentImmutableList<int> _unitUnderTest;
+        private ConcurrentImmutableList<int> _unitUnderTestEmpty = new ConcurrentImmutableList<int>();
+        private ConcurrentImmutableList<int> _unitUnderTestLarge;
         private readonly int[] EXPECTED = Enumerable.Range(1, STRESS_LEVEL).ToArray();
         private int[] ADDITIONS;
 
@@ -26,8 +26,8 @@ namespace Bnaya.CSharp.CollectionExtensions.Tests
         [TestInitialize]
         public void Setup()
         {
-            _unitUnderTest = new ConcurrentList<int>(EXPECTED.Take(START_COUNT));
-            _unitUnderTestLarge = new ConcurrentList<int>(EXPECTED);
+            _unitUnderTest = new ConcurrentImmutableList<int>(EXPECTED.Take(START_COUNT));
+            _unitUnderTestLarge = new ConcurrentImmutableList<int>(EXPECTED);
             ADDITIONS = EXPECTED.Skip(START_COUNT).ToArray();
         }
 

@@ -56,7 +56,7 @@ namespace System.Threading.Tasks
         /// <returns>lock disposal and acquired indication</returns>
         public async Task<LockScope> TryAcquireAsync(TimeSpan overrideTimeout = default(TimeSpan))
         {
-            var timeout = overrideTimeout == default(TimeSpan) ? _defaultTimeout : overrideTimeout;
+            var timeout = overrideTimeout == default ? _defaultTimeout : overrideTimeout;
             bool acquired = await _gate.WaitAsync(timeout).ConfigureAwait(false);            
             return new LockScope(_gate, acquired, this /* keep alive - avoid disposal */);
         }

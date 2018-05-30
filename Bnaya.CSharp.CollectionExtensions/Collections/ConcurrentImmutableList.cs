@@ -14,35 +14,35 @@ namespace System.Collections.Concurrent
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="System.Collections.Generic.IEnumerable{T}" />
     [DebuggerDisplay("Count = {Count}")]
-    [DebuggerTypeProxy(typeof(ConcurrentList<>.DebugView))]
-    public class ConcurrentList<T> : IList<T>
+    [DebuggerTypeProxy(typeof(ConcurrentImmutableList<>.DebugView))]
+    public class ConcurrentImmutableList<T> : IList<T>
     {
         private ImmutableList<T> _items;
 
         #region Ctor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentList{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConcurrentImmutableList{T}"/> class.
         /// </summary>
-        public ConcurrentList()
+        public ConcurrentImmutableList()
         {
             _items = ImmutableList<T>.Empty;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentList{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConcurrentImmutableList{T}"/> class.
         /// </summary>
         /// <param name="items">The items.</param>
-        public ConcurrentList(IEnumerable<T> items)
+        public ConcurrentImmutableList(IEnumerable<T> items)
         {
             _items = ImmutableList<T>.Empty.AddRange(items);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrentList{T}" /> class.
+        /// Initializes a new instance of the <see cref="ConcurrentImmutableList{T}" /> class.
         /// </summary>
         /// <param name="items">The items.</param>
-        public ConcurrentList(params T[] items)
+        public ConcurrentImmutableList(params T[] items)
         {
             _items = ImmutableList.Create(items);
         }
@@ -459,9 +459,9 @@ namespace System.Collections.Concurrent
 
         public class DebugView
         {
-            private readonly ConcurrentList<T> _items;
+            private readonly ConcurrentImmutableList<T> _items;
 
-            public DebugView(ConcurrentList<T> items)
+            public DebugView(ConcurrentImmutableList<T> items)
             {
                 _items = items;
             }

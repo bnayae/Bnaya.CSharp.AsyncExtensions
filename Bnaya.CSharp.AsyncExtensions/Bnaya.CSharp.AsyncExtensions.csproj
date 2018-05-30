@@ -54,10 +54,10 @@ Features
 
 Release 1.0.18 (Has Breaking Changes):
 Feature:
-- WhenN: use to complete task aftern n task succeed
+- WhenN: use to complete task after n task succeed
 BUG FIX:
 - Breaking changes: IsTimeoutAsync_Test (on versions below 1.0.17)
-  wes returning false when timeout detected and true when when timeout not detected
+  Previous versions was returning false when timeout detected and true when timeout not detected
 - AcquireAsync and TryAcquireAsync (object disposal race)
 </PackageReleaseNotes>
     <PackageProjectUrl>http://blogs.microsoft.co.il/bnaya/</PackageProjectUrl>
@@ -71,12 +71,21 @@ BUG FIX:
     <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Bnaya.CSharp.AsyncExtensions.1.0.0.nupkg" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.0" />
   </ItemGroup>
+
 
 </Project>
