@@ -1,4 +1,4 @@
-# Bnaya.CSharp.AsyncExtensions
+# Bnaya.CSharp.AsyncExtensions [![NuGet](https://img.shields.io/nuget/v/Bnaya.CSharp.AsyncExtensions.svg)](https://www.nuget.org/packages/Bnaya.CSharp.AsyncExtensions/)  
 Contribution of useful async pattern, API, Extensions, etc.
 
 # NuGet
