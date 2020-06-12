@@ -13,10 +13,10 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
     [TestClass]
     public class ExceptionFormat_Tests
     {
-        #region FormattingException_HaveAllStackInOrder_Test
+        #region FormattingException_HaveAllStackInOrder_WithLocation_Test
 
         [TestMethod]
-        public async Task FormattingException_HaveAllStackInOrder_Test()
+        public async Task LazyFormattingException_HaveAllStackInOrder_WithLocation_Test()
         {
             try
             {
@@ -24,8 +24,8 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             }
             catch (Exception ex)
             {
-                var formatted = ex.Format(None);
-                int idx0 = formatted.IndexOf(nameof(FormattingException_HaveAllStackInOrder_Test), StringComparison.Ordinal);
+                var formatted = ex.FormatLazy(ErrorFormattingOption.IncludeLineNumber);
+                int idx0 = formatted.IndexOf(nameof(FormattingException_HaveAllStackInOrder_WithLocation_Test), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx0);
                 int idx1 = formatted.IndexOf(nameof(Step1Async), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx1);
@@ -45,12 +45,18 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
                 // check duplication
                 int idx4x = formatted.IndexOf(nameof(OtherClass.Step4Async), idx4 + 2, StringComparison.Ordinal);
-                Assert.AreEqual(-1, idx4x);
+                Assert.AreNotEqual(-1, idx4x, "includeLocation option don't remove duplication");
+
+                // check location
+                int idx6 = formatted.IndexOf(".cs", StringComparison.Ordinal);
+                Assert.AreNotEqual(-1, idx6);
+                int idx7 = formatted.IndexOf(" line ", StringComparison.Ordinal);
+                Assert.AreNotEqual(-1, idx7);
             }
 
         }
 
-        #endregion // FormattingException_HaveAllStackInOrder_Test
+        #endregion // FormattingException_HaveAllStackInOrder_WithLocation_Test
 
         #region FormattingException_HaveAllStackInOrder_WithLocation_Test
 

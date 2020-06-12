@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using static System.Threading.Tasks.ErrorFormattingOption;
@@ -13,9 +17,12 @@ using static System.Threading.Tasks.ErrorFormattingOption;
 namespace System.Threading.Tasks
 {
     /// <summary>
-    /// Task Extensions
+    /// Exception wrapper which do the format of the exception at ToSting timing.
+    /// This can reduce compute and memory pressure when the exception send to
+    /// semantical logging where it might be filter out and won't be present.
     /// </summary>
-    public static class BnayaErrorHandlinglExtensions
+    [SuppressMessage("Design", "RCS1194:Implement exception constructors.", Justification = "<Pending>")]
+    public class LazyFormatException: Exception
     {
         private const int MAX_LEN_OF_INNER_SNAP_LINE = 50;
         private const string THROW_PREFIX = "  # Throw";
@@ -33,6 +40,9 @@ namespace System.Threading.Tasks
         private static readonly Regex ASYNC_REGEX3 = new Regex(@"^\s*at\s+(?<namespace>[\w|\.]+)\<\>c__DisplayClass[0-9|_]+\.\<\<(?<method>\w+)\>b__[0-9]+\>d\.MoveNext\(\)"); // at {namespace}<>c__DisplayClass##_##.<<{method}>b__##>d.MoveNext()
         private static readonly Regex ASYNC_REGEX4 = new Regex(@"^\s*at\s+(?<namespace>[\w|\.]+)\<\>c\.\<(?<method>\w+)\>b__[0-9|_]+\(\)"); // at {namespace}<>c.<{method}>b__##_##() in
         private static readonly Regex ASYNC_REGEX5 = new Regex(@"^\s*at\s+System\.Threading\.Tasks\.Task.*\.InnerInvoke\(\)"); // at System.Threading.Tasks.Task`1.InnerInvoke()
+
+        #region private static readonly string[] IGNORE_START_WITH = ...
+
         private static readonly string[] IGNORE_START_WITH =
             {
                 "at System.Runtime.ExceptionServices.",
@@ -54,79 +64,161 @@ namespace System.Threading.Tasks
                 "at System.Threading.Tasks.Task.ExecuteWithThreadLocal",
             };
 
+        #endregion
+
         private static readonly Regex CHAR_OR_NUMERIC = new Regex(@"[\w|\d]"); // char or digit  
+        private readonly ErrorFormattingOption _option;
+        private readonly char _replaceWith;
+
+        #region Ctor
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LazyFormatException" /> class.
+        /// </summary>
+        /// <param name="innerException">The inner exception.</param>
+        /// <param name="option">Formatting option.</param>
+        /// <param name="replaceWith">The replacement char.</param>
+        public LazyFormatException(
+            Exception innerException,
+            ErrorFormattingOption option = Default,
+            char replaceWith = '-') : 
+                base(string.Empty, innerException)
+        {
+            _option = option;
+            _replaceWith = replaceWith;
+        }
+
+        #endregion // Ctor
+
+        #region GetObjectData
+
+        /// <summary>
+        /// When overridden in a derived class, sets the <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> with information about the exception.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"></see> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"></see> that contains contextual information about the source or destination.</param>
+        public override void GetObjectData(
+            SerializationInfo info,
+            StreamingContext context)
+        {
+            InnerException.GetObjectData(info, context);
+        }
+
+        #endregion // GetObjectData
+
+        #region Source
+
+        /// <summary>
+        /// Gets or sets the name of the application or the object that causes the error.
+        /// </summary>
+        public override string Source 
+        { 
+            get => InnerException.Source; 
+            set => InnerException.Source = value; 
+        }
+
+        #endregion // Source
+
+        #region StackTrace
+
+        /// <summary>
+        /// Gets a string representation of the immediate frames on the call stack.
+        /// </summary>
+        public override string StackTrace => InnerException.StackTrace;
+
+        #endregion // StackTrace
+
+        #region HelpLink
+
+        /// <summary>
+        /// Gets or sets a link to the help file associated with this exception.
+        /// </summary>
+        public override string HelpLink 
+        {   get => InnerException.HelpLink;
+            set => InnerException.HelpLink = value; 
+        }
+
+        #endregion // HelpLink
+
+        #region Message
+
+        /// <summary>
+        /// Gets a message that describes the current exception.
+        /// </summary>
+        public override string Message => InnerException.Message;
+
+        #endregion // Message
+
+        #region GetBaseException
+
+        /// <summary>
+        /// When overridden in a derived class, returns the <see cref="T:System.Exception"></see> that is the root cause of one or more subsequent exceptions.
+        /// </summary>
+        /// <returns>
+        /// The first exception thrown in a chain of exceptions. If the <see cref="P:System.Exception.InnerException"></see> property of the current exception is a null reference (Nothing in Visual Basic), this property returns the current exception.
+        /// </returns>
+        public override Exception GetBaseException() => InnerException.GetBaseException();
+
+        #endregion // GetBaseException
+
+        #region Data
+
+        /// <summary>
+        /// Gets a collection of key/value pairs that provide additional user-defined information about the exception.
+        /// </summary>
+        public override IDictionary Data => InnerException.Data;
+
+        #endregion // Data
+
+        #region Equals
+
+        public override bool Equals(object obj)=>  InnerException.Equals(obj);
+
+        #endregion // Equals
+
+        #region GetHashCode
+
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// </returns>
+        public override int GetHashCode() => InnerException.GetHashCode();
+
+        #endregion // GetHashCode
+
+        #region ToString
+
+        private string _toStringCache = null;
+        /// <summary>
+        /// Converts to string.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            if (_toStringCache != null)
+                return _toStringCache;
+            _toStringCache = Format(InnerException, _option, _replaceWith);
+            return _toStringCache;
+        }
+
+        #endregion // ToString
 
         #region Format / FormatWithLineNumber
 
-        #region Overloads
-
-        /// <summary>
-        /// Simplify the exception.
-        /// </summary>
-        /// <param name="exception">The exception.</param>
-        /// <param name="includeFullUnformatedDetails">if set to <c>true</c> [include exception.ToString()].</param>
-        /// <param name="withLineNumber">if set to <c>true</c> [with line number].</param>
-        /// <returns>Formatted exception details</returns>
-        [Obsolete("deprecated: will be remove on future versions, Use ErrorFormattingOption for example:  Format with ErrorFormattingOption for example:  Format(ErrorFormattingOption.IncludeLineNumber | ErrorFormattingOption.IncludeFullUnformattedDetails | ErrorFormattingOption.FormatDuplication)")]
-        public static string Format(
-                this Exception exception,
-                bool includeFullUnformatedDetails,
-                bool withLineNumber)
-        {
-            return Format(exception, ErrorFormattingOption.FormatDuplication, includeFullUnformatedDetails, withLineNumber: withLineNumber);
-        }
-        /// <summary>
-        /// Simplify the exception.
-        /// Formats the with line number.
-        /// </summary>
-        /// <param name="exception">The exception.</param>
-        /// <param name="includeFullUnformatedDetails">if set to <c>true</c> [include full unformated details].</param>
-        /// <returns>Formatted exception details</returns>
-        [Obsolete("deprecated: will be remove on future versions, Use Format with ErrorFormattingOption for example:  Format(ErrorFormattingOption.IncludeLineNumber | ErrorFormattingOption.IncludeFullUnformattedDetails | ErrorFormattingOption.FormatDuplication)")]
-        public static string FormatWithLineNumber(
-                this Exception exception,
-                bool includeFullUnformatedDetails = false)
-        {
-            return Format(exception, ErrorFormattingOption.FormatDuplication, includeFullUnformatedDetails, withLineNumber: true);
-        }
-
+#pragma warning disable MS002 // Cyclomatic Complexity does not follow metric rules.
         /// <summary>
         /// Simplify the exception.
         /// </summary>
         /// <param name="exception">The exception.</param>
         /// <param name="option">Formatting option.</param>
-        /// <param name="includeFullUnformatedDetails">if set to <c>true</c> [include exception.ToString()].</param>
         /// <param name="replaceWith">The replacement char.</param>
-        /// <param name="withLineNumber">if set to <c>true</c> [with line number].</param>
         /// <returns>Formatted exception details</returns>
-        [Obsolete("deprecated: will be remove on future versions, Use ErrorFormattingOption for example:  Format with ErrorFormattingOption for example:  Format(ErrorFormattingOption.IncludeLineNumber | ErrorFormattingOption.IncludeFullUnformattedDetails | ErrorFormattingOption.FormatDuplication)")]
-        public static string Format(
-                this Exception exception,
-                ErrorFormattingOption option,
-                bool includeFullUnformatedDetails,
-                char replaceWith = '-',
-                bool withLineNumber = false)
-        {
-            if (includeFullUnformatedDetails)
-                option |= ErrorFormattingOption.IncludeFullUnformattedDetails;
-            if (withLineNumber)
-                option |= ErrorFormattingOption.IncludeLineNumber;
-
-            return Format(exception, option, replaceWith);
-        }
-
-        #endregion // Overloads
-
-#pragma warning disable MS002 // Cyclomatic Complexity does not follow metric rules.
-                             /// <summary>
-                             /// Simplify the exception.
-                             /// </summary>
-                             /// <param name="exception">The exception.</param>
-                             /// <param name="option">Formatting option.</param>
-                             /// <param name="replaceWith">The replacement char.</param>
-                             /// <returns>Formatted exception details</returns>
-        public static string Format(
-                this Exception exception,
+        private static string Format(
+                Exception exception,
                 ErrorFormattingOption option = Default,
                 char replaceWith = '-')
         {
@@ -185,7 +277,7 @@ namespace System.Threading.Tasks
                     builder.Append(candidate);
                 }
 
-                if ((option & IncludeFullUnformattedDetails) !=  None)
+                if ((option & IncludeFullUnformattedDetails) != None)
                 {
                     builder.AppendLine("====================== FULL INFORMATION ============================");
                     builder.AppendLine(exception.ToString());
@@ -405,7 +497,7 @@ namespace System.Threading.Tasks
         /// <param name="dest">The destination.</param>
         /// <param name="replaceWith">The replacement char.</param>
         /// <returns>the new string and the count of parts which was replaced</returns>
-        public static (string Candidate, int Count) HideDuplicatePaths(string src, string dest, char replaceWith = '-')
+        private static (string Candidate, int Count) HideDuplicatePaths(string src, string dest, char replaceWith = '-')
         {
             var pathBuilder = new StringBuilder();
             string[] dests = dest.Split('.');
@@ -428,6 +520,22 @@ namespace System.Threading.Tasks
         }
 
         #endregion // HideDuplicatePaths
+
+        #region Casting [operator overloads]
+
+        /// <summary>
+        /// Performs an implicit conversion from <see cref="LazyFormatException"/> to <see cref="System.String"/>.
+        /// </summary>
+        /// <param name="instance">The instance.</param>
+        /// <returns>
+        /// The result of the conversion.
+        /// </returns>
+        public static implicit operator string(LazyFormatException instance)
+        {
+            return instance.ToString();
+        }
+
+        #endregion // Casting [operator overloads]
     }
 }
 
