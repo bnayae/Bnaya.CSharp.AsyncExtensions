@@ -69,7 +69,7 @@ namespace System.Threading.Tasks
         /// <param name="option">Formatting option.</param>
         /// <param name="replaceWith">The replacement char.</param>
         /// <returns>Formatted exception details</returns>
-        public static string FormatLazy(
+        public static LazyFormatException FormatLazy(
                 this Exception exception,
                 ErrorFormattingOption option = Default,
                 char replaceWith = '-')

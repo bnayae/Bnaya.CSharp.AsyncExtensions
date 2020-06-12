@@ -24,7 +24,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             }
             catch (Exception ex)
             {
-                var formatted = ex.FormatLazy(ErrorFormattingOption.IncludeLineNumber);
+                string formatted = ex.FormatLazy(ErrorFormattingOption.IncludeLineNumber);
                 int idx0 = formatted.IndexOf(nameof(FormattingException_HaveAllStackInOrder_WithLocation_Test), StringComparison.Ordinal);
                 Assert.AreNotEqual(-1, idx0);
                 int idx1 = formatted.IndexOf(nameof(Step1Async), StringComparison.Ordinal);
