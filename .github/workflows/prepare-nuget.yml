@@ -21,6 +21,5 @@ jobs:
 
   version_increment:
     uses: weknow-network/weknow-workflows/.github/workflows/dotnet-increment-version.yml@main
-    needs: [validate-repo-prefix]
       
  
