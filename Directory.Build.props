@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<Version>1.0.37</Version>
+		<Version>1.0.38</Version>
 		<PackageReleaseNotes>
 			Default error formating don't includes IncludeFullUnformattedDetails anymore.
 		</PackageReleaseNotes>
