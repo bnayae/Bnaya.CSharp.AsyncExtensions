@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
+    [Trait("category", "ci")]
     public class ValueTask_Tests
     {
         [Fact]

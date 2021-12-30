@@ -9,7 +9,8 @@ using static System.Threading.Tasks.ErrorFormattingOption;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    
+
+    [Trait("category", "ci")]
     public class ExceptionFormat_Tests
     {
         #region FormattingException_HaveAllStackInOrder_WithLocation_Test

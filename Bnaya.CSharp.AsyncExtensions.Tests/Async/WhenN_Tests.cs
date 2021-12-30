@@ -7,6 +7,7 @@ using System.Threading;
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
     
+    [Trait("category", "non-ci")]
     public sealed class WhenN_Tests: IDisposable
     {
         private readonly AsyncLock _gate = new AsyncLock(TimeSpan.FromSeconds(10));

@@ -5,7 +5,8 @@ using System.Diagnostics;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    
+
+    [Trait("category", "ci")]
     public class WithTimeout_Tests
     {
         [Fact]

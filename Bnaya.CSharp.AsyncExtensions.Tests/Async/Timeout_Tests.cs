@@ -11,7 +11,8 @@ using System.Threading;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    
+
+    [Trait("category", "ci")]
     public class Timeout_Tests
     {
         #region IsTimeoutAsync_Test

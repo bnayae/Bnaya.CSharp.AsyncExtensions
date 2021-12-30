@@ -9,7 +9,8 @@ using System.Linq;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    
+
+    [Trait("category", "ci")]
     public class ThrowAll_Tests
     {
         #region ThrowAll_Task_Throw_Test

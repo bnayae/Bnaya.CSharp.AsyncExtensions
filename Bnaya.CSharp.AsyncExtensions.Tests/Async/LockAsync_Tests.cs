@@ -10,7 +10,8 @@ using System.Threading;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    
+
+    [Trait("category", "ci")]
     public class LockAsync_Tests
     {
         #region AsyncLock_Test 
