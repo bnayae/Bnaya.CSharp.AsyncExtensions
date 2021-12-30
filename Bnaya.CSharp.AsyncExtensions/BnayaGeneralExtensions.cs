@@ -140,11 +140,11 @@ namespace System
         /// <param name="action">The action.</param>
         [DebuggerNonUserCode]
         [DebuggerStepThrough]
-        public static Func<T1, TResult> AsWeak<T1, TResult>(
+        public static Func<T1, TResult?> AsWeak<T1, TResult>(
             this Func<T1, TResult> action)
         {
             var weak = new WeakReference<Func<T1, TResult>>(action);
-            Func<T1, TResult> result = (m1) =>
+            Func<T1, TResult?> result = (m1) =>
             {
                 Func<T1, TResult> act;
                 if (weak.TryGetTarget(out act))
@@ -167,11 +167,11 @@ namespace System
         /// <returns></returns>
         [DebuggerNonUserCode]
         [DebuggerStepThrough]
-        public static Func<T1, T2, TResult> AsWeak<T1, T2, TResult>(
+        public static Func<T1, T2, TResult?> AsWeak<T1, T2, TResult>(
             this Func<T1, T2, TResult> action)
         {
             var weak = new WeakReference<Func<T1, T2, TResult>>(action);
-            Func<T1, T2, TResult> result = (m1, m2) =>
+            Func<T1, T2, TResult?> result = (m1, m2) =>
             {
                 Func<T1, T2, TResult> act;
                 if (weak.TryGetTarget(out act))
@@ -189,16 +189,17 @@ namespace System
         /// </summary>
         /// <typeparam name="T1">The type of the 1.</typeparam>
         /// <typeparam name="T2">The type of the 2.</typeparam>
+        /// <typeparam name="T3">The type of the 3.</typeparam>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <param name="action">The action.</param>
         //[DebuggerHidden]
         [DebuggerNonUserCode]
         [DebuggerStepThrough]
-        public static Func<T1, T2, T3, TResult> AsWeak<T1, T2, T3, TResult>(
+        public static Func<T1, T2, T3, TResult?> AsWeak<T1, T2, T3, TResult>(
             this Func<T1, T2, T3, TResult> action)
         {
             var weak = new WeakReference<Func<T1, T2, T3, TResult>>(action);
-            Func<T1, T2, T3, TResult> result = (m1, m2, m3) =>
+            Func<T1, T2, T3, TResult?> result = (m1, m2, m3) =>
             {
                 Func<T1, T2, T3, TResult> act;
                 if (weak.TryGetTarget(out act))

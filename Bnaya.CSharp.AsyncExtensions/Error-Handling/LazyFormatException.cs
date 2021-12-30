@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using static System.Threading.Tasks.ErrorFormattingOption;
 
 [assembly: InternalsVisibleTo("Bnaya.CSharp.AsyncExtensions.Tests")]
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace System.Threading.Tasks
 {
@@ -172,6 +173,13 @@ namespace System.Threading.Tasks
 
         #region Equals
 
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
         public override bool Equals(object obj)=>  InnerException.Equals(obj);
 
         #endregion // Equals
@@ -190,7 +198,7 @@ namespace System.Threading.Tasks
 
         #region ToString
 
-        private string _toStringCache = null;
+        private string? _toStringCache = null;
         /// <summary>
         /// Converts to string.
         /// </summary>
@@ -247,12 +255,14 @@ namespace System.Threading.Tasks
 
                 builder.AppendLine("Formatted Stacks");
                 bool includeLineNumber = (option & IncludeLineNumber) != None;
+
+                if (exception == null)
+                    return string.Empty;
                 List<string> keep = FormaStack(exception, includeLineNumber);
-                string prev = null;
+                string? prev = null;
                 int lastCount = 0;
                 for (int i = 0; i < keep.Count; i++)
                 {
-                    // TODO: try to capture the parameters
                     string candidate = keep[i];
                     string origin = candidate;
                     if ((option & FormatDuplication) != None)
@@ -300,6 +310,7 @@ namespace System.Threading.Tasks
         /// Format the call stack
         /// </summary>
         /// <param name="exception">The exception.</param>
+        /// <param name="withLineNumber">if set to <c>true</c> [with line number].</param>
         /// <returns></returns>
         private static List<string> FormaStack(
             Exception exception,
@@ -342,6 +353,13 @@ namespace System.Threading.Tasks
         #region ReBuildStack
 
 #pragma warning disable MS002 // Cyclomatic Complexity does not follow metric rules.
+        /// <summary>
+        /// Re-build stack.
+        /// </summary>
+        /// <param name="exception">The exception.</param>
+        /// <param name="indent">The indent.</param>
+        /// <param name="withLineNumber">if set to <c>true</c> [with line number].</param>
+        /// <returns></returns>
         private static List<string> ReBuildStack(
             Exception exception,
             string indent = "",
@@ -381,6 +399,7 @@ namespace System.Threading.Tasks
 
                 #endregion // tmp.Add("# Throw (exception)")
 
+                if (exception == null) continue;
                 using (var r = new StringReader(exception.StackTrace))
                 {
                     while (true)
@@ -415,10 +434,12 @@ namespace System.Threading.Tasks
                             string at = string.Empty;
                             if (withLineNumber)
                             {
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
                                 string file = m.Groups?["file"]?.Value;
                                 if (file != null)
                                     file = Path.GetFileName(file);
                                 string loc = m.Groups?["loc"]?.Value;
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
                                 at = $" at {file} {loc}";
                             }
                             string data = $"{indent}\t{m.Groups?["namespace"]?.Value ?? "Missing"}{m.Groups?["method"]?.Value ?? "Missing"}(?){at} ->\r\n";

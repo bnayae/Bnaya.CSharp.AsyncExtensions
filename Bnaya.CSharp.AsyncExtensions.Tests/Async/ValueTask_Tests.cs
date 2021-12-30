@@ -1,18 +1,17 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Xunit;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    [TestClass]
     public class ValueTask_Tests
     {
-        [TestMethod]
+        [Fact]
         public void ToValueTask_Test()
         {
             ValueTask<string> vt = "ABC".ToValueTask();
-            Assert.AreEqual("ABC", vt.Result);
+            Assert.Equal("ABC", vt.Result);
         }
     }
 }

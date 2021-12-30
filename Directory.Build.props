@@ -1,0 +1,52 @@
+<Project>
+	<PropertyGroup>
+		<Version>1.0.28</Version>
+		<PackageReleaseNotes>
+			Default error formating don't includes IncludeFullUnformattedDetails anymore.
+		</PackageReleaseNotes>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<LangVersion>10</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Configurations>Debug;Release</Configurations>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<PackageIcon>async-ex.png</PackageIcon>
+		<PackageIconUrl>https://github.com/bnayae/BeyondAsyncAwait/blob/master/20.%20Cool%20Extensions/async-ex.png?raw=true</PackageIconUrl>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PackageTags>event-source, pub, sub, pubsub, messaging, reliable, redis, weknow, bnaya</PackageTags>
+		<PackageProjectUrl>https://medium.com/weknow-network</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/bnayae/Bnaya.CSharp.AsyncExtensions</RepositoryUrl>
+		<RepositoryType>GitHub</RepositoryType>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSource>True</IncludeSource>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PackageReleaseNotes>[BREAKING CHANGES] .NET 6</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="async-ex.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+</Project>

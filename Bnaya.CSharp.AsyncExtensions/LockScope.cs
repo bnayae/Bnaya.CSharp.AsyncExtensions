@@ -11,16 +11,17 @@ namespace System.Threading.Tasks
     /// </summary>
     public sealed class LockScope : IDisposable
     {
-        private SemaphoreSlim _gate;
-        private AsyncLock _keepAlive;
+        private SemaphoreSlim? _gate;
+        private AsyncLock? _keepAlive;
 
         #region Ctor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LockScope"/> class.
+        /// Initializes a new instance of the <see cref="LockScope" /> class.
         /// </summary>
         /// <param name="gate">The gate.</param>
         /// <param name="acquired">if set to <c>true</c> [acquired].</param>
+        /// <param name="keepAlive">The keep alive.</param>
         internal LockScope(
             SemaphoreSlim gate,
             bool acquired,

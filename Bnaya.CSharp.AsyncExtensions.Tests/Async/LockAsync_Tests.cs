@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -10,19 +10,19 @@ using System.Threading;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    [TestClass]
+    
     public class LockAsync_Tests
     {
         #region AsyncLock_Test 
 
-        [TestMethod]
+        [Fact]
         public async Task AsyncLock_Stress_Test()
         {
             var tasks = Enumerable.Range(0, 1000)
                             .Select(_ => AsyncLock_Test());
             await Task.WhenAll(tasks);
         }
-        [TestMethod]
+        [Fact]
         public async Task AsyncLock_Test()
         {
             using (var locker = new AsyncLock(TimeSpan.FromMilliseconds(200)))
@@ -37,14 +37,14 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                         }
                     });
                     await Task.Delay(5).ConfigureAwait(false);
-                    Assert.IsFalse(fireForget.IsCompleted, "fireForget.IsCompleted");
+                    Assert.False(fireForget.IsCompleted, "fireForget.IsCompleted");
                 }
                 await fireForget.WithTimeout(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
-                Assert.IsTrue(fireForget.IsCompleted, "IsCompleted");
+                Assert.True(fireForget.IsCompleted, "IsCompleted");
                 await fireForget;
             }
         }
-        [TestMethod]
+        [Fact]
         public async Task AsyncLock_WithGcCollect_Test()
         {
             using (var locker = new AsyncLock(TimeSpan.FromMilliseconds(200)))
@@ -70,21 +70,21 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region AsyncLock_TryAcquireAsync_Stress_Test 
 
-        [TestMethod]
+        [Fact]
         public async Task AsyncLock_TryAcquireAsync_Stress_Test()
         {
             var tasks = Enumerable.Range(0, 1000)
                             .Select(_ => AsyncLock_TryAcquireAsync_Test());
             await Task.WhenAll(tasks);
         }
-        [TestMethod]
+        [Fact]
         public async Task AsyncLock_TryAcquireAsync_Test()
         {
             var locker = new AsyncLock(TimeSpan.FromMilliseconds(200));
             Task fireForget;
             using (LockScope scope = await locker.TryAcquireAsync(TimeSpan.FromSeconds(5)))
             {
-                Assert.IsTrue(scope.Acquired);
+                Assert.True(scope.Acquired);
                 fireForget = Task.Run(async () =>
                 {
                     var sw = Stopwatch.StartNew();
@@ -92,15 +92,15 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                     {
                         sw.Stop();
                         // 48: timer may not be so accurate
-                        Assert.IsTrue(sw.ElapsedMilliseconds >= 48, $"sw.ElapsedMilliseconds >= 50, Actual = {sw.ElapsedMilliseconds}");
-                        Assert.IsFalse(scopeInner.Acquired, "scopeInner.Acquired");
+                        Assert.True(sw.ElapsedMilliseconds >= 48, $"sw.ElapsedMilliseconds >= 50, Actual = {sw.ElapsedMilliseconds}");
+                        Assert.False(scopeInner.Acquired, "scopeInner.Acquired");
                     }
                 });
                 await Task.Delay(100).ConfigureAwait(false);
             }
             await fireForget;
         }
-        [TestMethod]
+        [Fact]
         public async Task AsyncLock_TryAcquireAsync_WithGcCollect_Test()
         {
             using (var locker = new AsyncLock(TimeSpan.FromMilliseconds(200)))
@@ -121,7 +121,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 await fireForget;
             }
         }
-        [TestMethod]
+        [Fact]
         public async Task AsyncLock_TryAcquireAsync_Out_WithGcCollect_Test()
         {
             using (LockScope scope = await GetLockScope().ConfigureAwait(false))
@@ -141,21 +141,21 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region SemaphoreSlim_AcquireAsync_Stress_Test 
 
-        [TestMethod]
+        [Fact]
         public async Task SemaphoreSlim_AcquireAsync_Stress_Test()
         {
             var tasks = Enumerable.Range(0, 1000)
                             .Select(_ => SemaphoreSlim_AcquireAsync_Test());
             await Task.WhenAll(tasks);
         }
-        [TestMethod]
+        [Fact]
         public async Task SemaphoreSlim_AcquireAsync_WithGcCollect_Stress_Test()
         {
             var tasks = Enumerable.Range(0, 50)
                             .Select(_ => SemaphoreSlim_AcquireAsync_WithGcCollect_Test());
             await Task.WhenAll(tasks);
         }
-        [TestMethod]
+        [Fact]
         public async Task SemaphoreSlim_AcquireAsync_Test()
         {
             using (var sync = new SemaphoreSlim(1))
@@ -170,14 +170,14 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                         }
                     });
                     await Task.Delay(5).ConfigureAwait(false);
-                    Assert.IsFalse(fireForget.IsCompleted, "fireForget.IsCompleted");
+                    Assert.False(fireForget.IsCompleted, "fireForget.IsCompleted");
                 }
                 await Task.Delay(5).ConfigureAwait(false);
-                Assert.IsTrue(fireForget.IsCompleted, "fireForget.IsCompleted");
+                Assert.True(fireForget.IsCompleted, "fireForget.IsCompleted");
                 await fireForget;
             }
         }
-        [TestMethod]
+        [Fact]
         public async Task SemaphoreSlim_AcquireAsync_WithGcCollect_Test()
         {
             using (var sync = new SemaphoreSlim(1))
@@ -203,14 +203,14 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region SemaphoreSlim_TryAcquireAsync_Stress_Test 
 
-        [TestMethod]
+        [Fact]
         public async Task SemaphoreSlim_TryAcquireAsync_Stress_Test()
         {
             var tasks = Enumerable.Range(0, 1000)
                             .Select(_ => SemaphoreSlim_TryAcquireAsync_Test());
             await Task.WhenAll(tasks);
         }
-        [TestMethod]
+        [Fact]
         public async Task SemaphoreSlim_TryAcquireAsync_Test()
         {
             using (var sync = new SemaphoreSlim(1))
@@ -218,15 +218,15 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 Task fireForget;
                 using (LockScope scope = await sync.TryAcquireAsync(TimeSpan.FromSeconds(5)))
                 {
-                    Assert.IsTrue(scope.Acquired);
+                    Assert.True(scope.Acquired);
                     var sw = Stopwatch.StartNew();
                     fireForget = Task.Run(async () =>
                     {
                         using (LockScope scopeInner = await sync.TryAcquireAsync(TimeSpan.FromMilliseconds(50)))
                         {
                             sw.Stop();
-                            Assert.IsTrue(sw.ElapsedMilliseconds >= 50, $"sw.ElapsedMilliseconds >= 50, Actual = {sw.ElapsedMilliseconds}");
-                            Assert.IsFalse(scopeInner.Acquired, "scopeInner.Acquired");
+                            Assert.True(sw.ElapsedMilliseconds >= 50, $"sw.ElapsedMilliseconds >= 50, Actual = {sw.ElapsedMilliseconds}");
+                            Assert.False(scopeInner.Acquired, "scopeInner.Acquired");
                         }
                     });
                     await Task.Delay(100).ConfigureAwait(false);
@@ -239,7 +239,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region AsyncLock_Timeout_Test 
 
-        [TestMethod]
+        [Fact]
         public async Task AsyncLock_Timeout_Stress_Test()
         {
             var tasks = Enumerable.Range(0, 1000)
@@ -247,7 +247,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             await Task.WhenAll(tasks);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task AsyncLock_Timeout_Test()
         {
             using (var locker = new AsyncLock(TimeSpan.FromMilliseconds(1)))

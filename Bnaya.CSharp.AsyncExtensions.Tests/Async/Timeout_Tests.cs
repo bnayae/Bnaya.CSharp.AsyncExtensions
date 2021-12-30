@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -11,36 +11,36 @@ using System.Threading;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    [TestClass]
+    
     public class Timeout_Tests
     {
         #region IsTimeoutAsync_Test
 
-        [TestMethod]
+        [Fact]
         public async Task IsTimeoutAsync_Test()
         {
             bool timedout = await Task.Delay(200)
                 .IsTimeoutAsync(TimeSpan.FromMilliseconds(2)).ConfigureAwait(false);
-            Assert.IsTrue(timedout);
+            Assert.True(timedout);
         }
 
         #endregion // IsTimeoutAsync_Test
 
         #region IsTimeoutAsync_CompleteOnTime_Test
 
-        [TestMethod]
+        [Fact]
         public async Task IsTimeoutAsync_CompleteOnTime_Test()
         {
             bool timedout = await Task.Delay(2)
                 .IsTimeoutAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(false);
-            Assert.IsFalse(timedout);
+            Assert.False(timedout);
         }
 
         #endregion // IsTimeoutAsync_CompleteOnTime_Test
 
         #region WithTimeout_Test
 
-        [TestMethod]
+        [Fact]
         public async Task WithTimeout_Test()
         {
             try
@@ -58,7 +58,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region WithTimeout_CompleteOnTime_Test
 
-        [TestMethod]
+        [Fact]
         public async Task WithTimeout_CompleteOnTime_Test()
         {
             try
@@ -76,7 +76,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region WithTimeout_CompleteOnTime_WithDefault_Test
 
-        [TestMethod]
+        [Fact]
         public async Task WithTimeout_CompleteOnTime_WithDefault_Test()
         {
             try
@@ -94,7 +94,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
  
         #region WithTimeout_OfT_Test
 
-        [TestMethod]
+        [Fact]
         public async Task WithTimeout_OfT_Test()
         {
             try
@@ -116,7 +116,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region WithTimeout_OfT_CompleteOnTime_Test
 
-        [TestMethod]
+        [Fact]
         public async Task WithTimeout_OfT_CompleteOnTime_Test()
         {
             try

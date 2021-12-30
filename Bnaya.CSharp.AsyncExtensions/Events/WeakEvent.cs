@@ -135,19 +135,21 @@ public sealed class WeakEvent<T> : IDisposable
             IEquatable<WeakReference<Action<T>>>,
             IEquatable<EquatableWeakReference>
     {
+        private readonly static Action<T> Empty = (_) => { };
+
         #region Ctor
 
 #pragma warning disable MS003 // Lines of Code does not follow metric rules.
-                             /// <summary>
-                             /// Initializes a new instance of the <see cref="EquatableWeakReference`1"/> class.
-                             /// </summary>
-                             /// <param name="target">The object to track or null.</param>
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        /// <param name="target">The object to track or null.</param>
         public EquatableWeakReference(object target) : base(target)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EquatableWeakReference`1"/> class.
+        /// Initializes a new instance.
         /// </summary>
         /// <param name="target">An object to track.</param>
         /// <param name="trackResurrection">Indicates when to stop tracking the object. If true, the object is tracked after finalization; if false, the object is only tracked until finalization.</param>
@@ -156,7 +158,7 @@ public sealed class WeakEvent<T> : IDisposable
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EquatableWeakReference`1"/> class.
+        /// Initializes a new instance.
         /// </summary>
         /// <param name="info">An object that holds all the data needed to serialize or deserialize the current <see cref="T:System.WeakReference"></see> object.</param>
         /// <param name="context">(Reserved) Describes the source and destination of the serialized stream specified by info.</param>
@@ -187,7 +189,7 @@ public sealed class WeakEvent<T> : IDisposable
         /// <summary>
         /// Gets or sets the object (the target) referenced by the current <see cref="T:System.WeakReference"></see> object.
         /// </summary>
-        public new Action<T> Target => base.Target as Action<T>;
+        public new Action<T> Target => base.Target as Action<T> ?? Empty;
 
         #endregion // Target
 

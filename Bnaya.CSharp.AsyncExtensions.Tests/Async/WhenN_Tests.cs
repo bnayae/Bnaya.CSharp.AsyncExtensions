@@ -1,27 +1,27 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Threading;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    [TestClass]
+    
     public sealed class WhenN_Tests: IDisposable
     {
         private readonly AsyncLock _gate = new AsyncLock(TimeSpan.FromSeconds(10));
 
         #region When_Test
 
-        [TestMethod]
-        public Task When_Test() => When_Test(true);
-        [DataTestMethod]
-        [DataRow(true)]
-        [DataRow(false)]
-        public async Task When_Test(
+        [Fact]
+        public Task When_Test() => When_Test_All(true);
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task When_Test_All(
             bool useCancellation)
         {
-            var cancellation = useCancellation ? new CancellationTokenSource() : null;
+            var cancellation = useCancellation ? new CancellationTokenSource() : default;
             using (await _gate.AcquireAsync())
             {
                 // arrange
@@ -44,11 +44,11 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 sw.Stop();
                 TimeSpan duration = sw.Elapsed;
                 if (cancellation != null)
-                    Assert.IsTrue(cancellation.IsCancellationRequested, "Cancellation");
-                Assert.IsTrue(duration >= TimeSpan.FromMilliseconds(50) &&
+                    Assert.True(cancellation.IsCancellationRequested, "Cancellation");
+                Assert.True(duration >= TimeSpan.FromMilliseconds(50) &&
                               duration < TimeSpan.FromMilliseconds(100), "Duration");
-                Assert.IsTrue(succeed, "Succeed");
-                Assert.AreEqual(50, result);
+                Assert.True(succeed, "Succeed");
+                Assert.Equal(50, result);
                 await all.WithTimeout(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
                 cancellation?.Dispose();
             }
@@ -64,21 +64,21 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region WhenN_OfT_Test
 
-        [TestMethod]
-        public Task WhenN_OfT_Test() => WhenN_OfT_Test(2, true, true);
-        [DataTestMethod]
-        [DataRow(2, true, true)]
-        [DataRow(2, false, true)]
-        [DataRow(2, true, true)]
-        [DataRow(2, false, false)]
-        public async Task WhenN_OfT_Test(
+        [Fact]
+        public Task WhenN_OfT_Test() => WhenN_OfT_Test_All(2, true, true);
+        [Theory]
+        [InlineData(2, true, true)]
+        [InlineData(2, false, true)]
+        [InlineData(2, true, false)]
+        [InlineData(2, false, false)]
+        public async Task WhenN_OfT_Test_All(
             int threshold,
             bool useCondition,
             bool useCancellation)
         {
             var cancellation = useCancellation ? new CancellationTokenSource() : null;
             int minDuration = 50;
-            Func<int, bool> condition = null;
+            Func<int, bool>? condition = null;
             if (useCondition)
             {
                 condition = x => x != 50;
@@ -107,12 +107,12 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 sw.Stop();
                 TimeSpan duration = sw.Elapsed;
                 if (cancellation != null)
-                    Assert.IsTrue(cancellation.IsCancellationRequested, "Cancellation");
-                Assert.IsTrue(duration >= TimeSpan.FromMilliseconds(minDuration) &&
+                    Assert.True(cancellation.IsCancellationRequested, "Cancellation");
+                Assert.True(duration >= TimeSpan.FromMilliseconds(minDuration) &&
                               duration < TimeSpan.FromMilliseconds(200), "Duration");
-                Assert.IsTrue(succeed, "Succeed");
-                Assert.AreEqual(1, results[0]);
-                Assert.AreEqual(minDuration, results[1]);
+                Assert.True(succeed, "Succeed");
+                Assert.Equal(1, results[0]);
+                Assert.Equal(minDuration, results[1]);
                 await all.WithTimeout(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
                 cancellation?.Dispose();
             }
@@ -128,7 +128,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region WhenN_OfT_NotSucceed_Test
 
-        [TestMethod]
+        [Fact]
         public async Task WhenN_OfT_NotSucceed_Test()
         {
             // arrange
@@ -151,11 +151,11 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             // assert
             sw.Stop();
             TimeSpan duration = sw.Elapsed;
-            Assert.IsFalse(cancellation.IsCancellationRequested, "Cancellation");
-            Assert.IsTrue(duration >= TimeSpan.FromMilliseconds(200), "Duration");
-            Assert.IsFalse(succeed, "Succeed");
-            Assert.AreEqual(1, results[0]);
-            Assert.AreEqual(1, results.Length, "Length");
+            Assert.False(cancellation.IsCancellationRequested, "Cancellation");
+            Assert.True(duration >= TimeSpan.FromMilliseconds(200), "Duration");
+            Assert.False(succeed, "Succeed");
+            Assert.Equal(1, results[0]);
+            Assert.Single(results);
             await all.WithTimeout(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
             cancellation?.Dispose();
 
@@ -170,12 +170,13 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region WhenN_Test
 
-        [TestMethod]
-        public Task WhenN_Test() => WhenN_Test(2, true);
-        [DataTestMethod]
-        [DataRow(2, true)]
-        [DataRow(2, false)]
-        public async Task WhenN_Test(
+        [Fact]
+        public Task WhenN_Test() => WhenN_Test_All(2, true);
+
+        [Theory]
+        [InlineData(2, true)]
+        [InlineData(2, false)]
+        public async Task WhenN_Test_All(
             int threshold,
             bool useCancellation)
         {
@@ -200,8 +201,8 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             sw.Stop();
             TimeSpan duration = sw.Elapsed;
             if(cancellation != null)
-                Assert.IsTrue(cancellation.IsCancellationRequested, "Cancellation");
-            Assert.IsTrue(duration >= TimeSpan.FromMilliseconds(50) &&
+                Assert.True(cancellation.IsCancellationRequested, "Cancellation");
+            Assert.True(duration >= TimeSpan.FromMilliseconds(50) &&
                           duration < TimeSpan.FromMilliseconds(100), "Duration");
             await all.WithTimeout(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
             cancellation?.Dispose();

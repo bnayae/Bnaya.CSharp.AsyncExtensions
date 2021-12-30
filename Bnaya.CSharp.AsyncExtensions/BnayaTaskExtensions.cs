@@ -147,7 +147,7 @@ namespace System.Threading.Tasks
         public static bool CancelSafe(
             this CancellationTokenSource instance)
         {
-            return CancelSafe(instance, out Exception ex);
+            return CancelSafe(instance, out Exception? ex);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace System.Threading.Tasks
         /// <param name="exc">The exception (on fault cancellation).</param>
         /// <returns></returns>
         public static bool CancelSafe(
-            this CancellationTokenSource instance, out Exception exc)
+            this CancellationTokenSource instance, out Exception? exc)
         {
             exc = null;
             try
@@ -303,10 +303,10 @@ namespace System.Threading.Tasks
         /// Succeed: indicate whether completed task
         /// (which pass the condition) reach the threshold.
         /// </returns>
-        public static async Task<(T Result, bool Succeed, Task<T[]> All)> When<T>(
+        public static async Task<(T? Result, bool Succeed, Task<T[]> All)> When<T>(
             this IEnumerable<Task<T>> tasks,
             Func<T, bool> condition,
-            CancellationTokenSource cancellation = null)
+            CancellationTokenSource? cancellation = null)
         {
             (T[] items, bool succeed, Task<T[]> all) = await WhenN(tasks, 1, condition, cancellation);
             if(succeed)
@@ -337,7 +337,7 @@ namespace System.Threading.Tasks
         public static Task<Task> WhenN(
             this IEnumerable<Task> tasks,
             int threshold,
-            CancellationTokenSource cancellation = null)
+            CancellationTokenSource? cancellation = null)
         {
             return WhenN(tasks.ToArray(), threshold, cancellation);
         }
@@ -364,8 +364,8 @@ namespace System.Threading.Tasks
         public static Task<(T[] Results, bool Succeed, Task<T[]> All)> WhenN<T>(
             this IEnumerable<Task<T>> tasks,
             int threshold,
-            Func<T, bool> condition = null,
-            CancellationTokenSource cancellation = null)
+            Func<T, bool>? condition = null,
+            CancellationTokenSource? cancellation = null)
         {
             return WhenN(tasks.ToArray(), threshold, condition, cancellation);
         }
@@ -394,11 +394,11 @@ namespace System.Threading.Tasks
         public static async Task<(T[] Results, bool Succeed, Task<T[]> All)> WhenN<T>(
             this Task<T>[] tasks,
             int threshold,
-            Func<T, bool> condition = null,
-            CancellationTokenSource cancellation = null)
+            Func<T, bool>? condition = null,
+            CancellationTokenSource? cancellation = null)
         {
             // use for signal completion
-            var completionEvent = new TaskCompletionSource<object>();
+            var completionEvent = new TaskCompletionSource<object?>();
             var queue = new ConcurrentQueue<T>();
 
             Task<T[]> allTasks = Task.WhenAll(tasks);
@@ -452,10 +452,10 @@ namespace System.Threading.Tasks
         public static async Task<Task> WhenN(
             this Task[] tasks,
             int threshold,
-            CancellationTokenSource cancellation = null)
+            CancellationTokenSource? cancellation = null)
         {
             // use for signal completion
-            var completionEvent = new TaskCompletionSource<object>();
+            var completionEvent = new TaskCompletionSource<object?>();
             int completeCount = 0;
 
             Task allTasks = Task.WhenAll(tasks);

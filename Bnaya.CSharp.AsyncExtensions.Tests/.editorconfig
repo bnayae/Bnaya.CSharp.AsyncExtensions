@@ -1,0 +1,11 @@
+﻿[*.cs]
+
+# MethodDocumentationHeader: The method must have a documentation header.
+dotnet_diagnostic.MethodDocumentationHeader.severity = none
+# ClassDocumentationHeader: The class must have a documentation header.
+dotnet_diagnostic.ClassDocumentationHeader.severity = none
+# ConstFieldDocumentationHeader
+dotnet_diagnostic.ConstFieldDocumentationHeader.severity = none
+
+# IDE0008: Use explicit type
+csharp_style_var_elsewhere = true

@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    [TestClass]
+    
     public class WithTimeout_Tests
     {
-        [TestMethod]
+        [Fact]
         public async Task WithTimeout_Pass_Test()
         {
             await Task.Delay(1)

@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -9,12 +9,12 @@ using System.Linq;
 
 namespace Bnaya.CSharp.AsyncExtensions.Tests
 {
-    [TestClass]
+    
     public class ThrowAll_Tests
     {
         #region ThrowAll_Task_Throw_Test
 
-        [TestMethod]
+        [Fact]
         public async Task ThrowAll_Task_Throw_Test()
         {
             try
@@ -27,7 +27,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             catch (AggregateException ex)
             {
                 var joinedMessages = string.Join("-", ex.InnerExceptions.Select(e => e.Message));
-                Assert.AreEqual("A-B", joinedMessages);
+                Assert.Equal("A-B", joinedMessages);
             }
             catch (Exception)
             {
@@ -40,7 +40,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region ThrowAll_Task_Throw_Test
 
-        [TestMethod]
+        [Fact]
         public async Task ThrowAll_TaskOfT_Throw_Test()
         {
             try
@@ -54,7 +54,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             catch (AggregateException ex)
             {
                 var joinedMessages = string.Join("-", ex.InnerExceptions.Select(e => e.Message));
-                Assert.AreEqual("Attempted to divide by zero.-Attempted to divide by zero.", joinedMessages);
+                Assert.Equal("Attempted to divide by zero.-Attempted to divide by zero.", joinedMessages);
             }
             catch (Exception)
             {
@@ -67,7 +67,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region ThrowAll_Task_Succeed_Test
 
-        [TestMethod]
+        [Fact]
         public async Task ThrowAll_Task_Succeed_Test()
         {
             try
@@ -91,7 +91,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
 
         #region ThrowAll_TaskOfT_Succeed_Test
 
-        [TestMethod]
+        [Fact]
         public async Task ThrowAll_TaskOfT_Succeed_Test()
         {
             try

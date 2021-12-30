@@ -1,32 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bnaya.CSharp.AsyncExtensions", "Bnaya.CSharp.AsyncExtensions\Bnaya.CSharp.AsyncExtensions.csproj", "{AE366E33-765A-412B-B73D-E0B91DC02E8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bnaya.CSharp.AsyncExtensions.Tests", "Bnaya.CSharp.AsyncExtensions.Tests\Bnaya.CSharp.AsyncExtensions.Tests.csproj", "{49FAC379-9B9D-41E8-9B00-A9C9F7165A12}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bnaya.CSharp.RxExtensions", "Bnaya.CSharp.RxExtensions\Bnaya.CSharp.RxExtensions.csproj", "{24482D3F-65B1-42A7-ABD6-FC53E072EE0A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bnaya.CSharp.CollectionExtensions", "Bnaya.CSharp.CollectionExtensions\Bnaya.CSharp.CollectionExtensions.csproj", "{33846813-C795-4386-9537-73FBA8A0D2E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bnaya.CSharp.AsyncExtensions.Tests", "Bnaya.CSharp.AsyncExtensions.Tests\Bnaya.CSharp.AsyncExtensions.Tests.csproj", "{49FAC379-9B9D-41E8-9B00-A9C9F7165A12}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A14C2086-5FDA-4212-869B-061DFD908C07}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
 		Ideas.txt = Ideas.txt
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConsoleTests", "ConsoleTests", "{B0355018-56BF-4DC1-BB81-5287C50BECC6}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreConsoleTest", "ConsoleTests\CoreConsoleTest\CoreConsoleTest.csproj", "{9B40A949-D189-40E1-A44C-C67D18C0BAB6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bnaya.CSharp.CollectionExtensions.Tests", "Bnaya.CSharp.CollectionExtensions.Tests\Bnaya.CSharp.CollectionExtensions.Tests.csproj", "{9C6A24F5-3255-4052-93CC-ED3C25B90143}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bnaya.CSharp.CollectionExtensions.Benchmarks", "Bnaya.CSharp.CollectionExtensions.Benchmarks\Bnaya.CSharp.CollectionExtensions.Benchmarks.csproj", "{69DCC68F-ED77-4E7D-BDD6-8266514AAB5C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Collection", "Collection", "{73C90491-65A3-423E-9D7B-59373BE9EBD3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bnaya.CSharpCollectionExtension.PerfCompare", "Bnaya.CSharpCollectionExtension.PerfCompare\Bnaya.CSharpCollectionExtension.PerfCompare.csproj", "{7E5E7A16-4CCF-4334-BCD5-15465169CC46}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,40 +28,9 @@ Global
 		{49FAC379-9B9D-41E8-9B00-A9C9F7165A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49FAC379-9B9D-41E8-9B00-A9C9F7165A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49FAC379-9B9D-41E8-9B00-A9C9F7165A12}.Release|Any CPU.Build.0 = Release|Any CPU
-		{24482D3F-65B1-42A7-ABD6-FC53E072EE0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24482D3F-65B1-42A7-ABD6-FC53E072EE0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24482D3F-65B1-42A7-ABD6-FC53E072EE0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24482D3F-65B1-42A7-ABD6-FC53E072EE0A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{33846813-C795-4386-9537-73FBA8A0D2E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{33846813-C795-4386-9537-73FBA8A0D2E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{33846813-C795-4386-9537-73FBA8A0D2E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{33846813-C795-4386-9537-73FBA8A0D2E8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B40A949-D189-40E1-A44C-C67D18C0BAB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B40A949-D189-40E1-A44C-C67D18C0BAB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B40A949-D189-40E1-A44C-C67D18C0BAB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B40A949-D189-40E1-A44C-C67D18C0BAB6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9C6A24F5-3255-4052-93CC-ED3C25B90143}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9C6A24F5-3255-4052-93CC-ED3C25B90143}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9C6A24F5-3255-4052-93CC-ED3C25B90143}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9C6A24F5-3255-4052-93CC-ED3C25B90143}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69DCC68F-ED77-4E7D-BDD6-8266514AAB5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69DCC68F-ED77-4E7D-BDD6-8266514AAB5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69DCC68F-ED77-4E7D-BDD6-8266514AAB5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69DCC68F-ED77-4E7D-BDD6-8266514AAB5C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7E5E7A16-4CCF-4334-BCD5-15465169CC46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7E5E7A16-4CCF-4334-BCD5-15465169CC46}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7E5E7A16-4CCF-4334-BCD5-15465169CC46}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7E5E7A16-4CCF-4334-BCD5-15465169CC46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{33846813-C795-4386-9537-73FBA8A0D2E8} = {73C90491-65A3-423E-9D7B-59373BE9EBD3}
-		{9B40A949-D189-40E1-A44C-C67D18C0BAB6} = {B0355018-56BF-4DC1-BB81-5287C50BECC6}
-		{9C6A24F5-3255-4052-93CC-ED3C25B90143} = {73C90491-65A3-423E-9D7B-59373BE9EBD3}
-		{69DCC68F-ED77-4E7D-BDD6-8266514AAB5C} = {73C90491-65A3-423E-9D7B-59373BE9EBD3}
-		{7E5E7A16-4CCF-4334-BCD5-15465169CC46} = {73C90491-65A3-423E-9D7B-59373BE9EBD3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B314C6AA-F951-4F27-BCEC-7C4C5EB1988F}

@@ -7,6 +7,11 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+#pragma warning disable CS8601 // Possible null reference assignment.
+#pragma warning disable RCS1165 // Unconstrained type parameter checked for null.
+
 namespace System.Threading.Tasks
 {
     /// <summary>
@@ -190,18 +195,17 @@ namespace System.Threading.Tasks
         /// </returns>
         public override string ToString()
         {
-#pragma warning disable RCS1165 // Unconstrained type parameter checked for null.
             if (_task != null)
             {
                 if(_task.Status == TaskStatus.RanToCompletion)
-                    return _task.Result.ToString() ?? string.Empty;
+                    return 
+                        _task?.Result?.ToString() ?? string.Empty;
                 return string.Empty;
             }
             else
             {
                 return _result?.ToString() ?? string.Empty;
             }
-#pragma warning restore RCS1165 // Unconstrained type parameter checked for null.
         }
 
         #endregion // ToString
@@ -230,7 +234,7 @@ namespace System.Threading.Tasks
         /// <returns>
         ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return
                 obj is TaskLike<TResult> &&
@@ -316,7 +320,7 @@ namespace System.Threading.Tasks
         }
 
         /// <summary>
-        /// Performs an implicit conversion from <see cref="TResult" /> to <see cref="System.Threading.Tasks.TaskLike{TResult}" />.
+        /// Performs an implicit conversion from TResult to TaskLike{TResult}".
         /// </summary>
         /// <param name="instance">The instance.</param>
         /// <returns>

@@ -29,6 +29,6 @@ namespace System.Threading.Tasks
         /// <summary>
         /// The default
         /// </summary>
-        Default = IncludeLineNumber | IncludeFullUnformattedDetails | FormatDuplication,
+        Default = IncludeLineNumber | FormatDuplication,
     }
 }
