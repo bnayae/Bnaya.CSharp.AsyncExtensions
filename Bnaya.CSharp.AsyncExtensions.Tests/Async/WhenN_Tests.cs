@@ -29,7 +29,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 Task<int>[] tasks =
                          {
                         Delayed(TimeSpan.FromMilliseconds(1)),
-                        Delayed(TimeSpan.FromMilliseconds(45)),
+                        Delayed(TimeSpan.FromMilliseconds(50)),
                         Delayed(TimeSpan.FromMilliseconds(100)),
                         Delayed(TimeSpan.FromMilliseconds(200))
                     };
@@ -91,7 +91,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 Task<int>[] tasks =
                          {
                         Delayed(TimeSpan.FromMilliseconds(1)),
-                        Delayed(TimeSpan.FromMilliseconds(45)),
+                        Delayed(TimeSpan.FromMilliseconds(50)),
                         Delayed(TimeSpan.FromMilliseconds(100)),
                         Delayed(TimeSpan.FromMilliseconds(200))
                     };
