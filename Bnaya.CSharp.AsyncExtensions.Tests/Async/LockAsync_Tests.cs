@@ -225,7 +225,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                         using (LockScope scopeInner = await sync.TryAcquireAsync(TimeSpan.FromMilliseconds(50)))
                         {
                             sw.Stop();
-                            Assert.True(sw.ElapsedMilliseconds >= 50, $"sw.ElapsedMilliseconds >= 50, Actual = {sw.ElapsedMilliseconds}");
+                            Assert.True(sw.ElapsedMilliseconds >= 45, $"sw.ElapsedMilliseconds >= 50, Actual = {sw.ElapsedMilliseconds}");
                             Assert.False(scopeInner.Acquired, "scopeInner.Acquired");
                         }
                     });
