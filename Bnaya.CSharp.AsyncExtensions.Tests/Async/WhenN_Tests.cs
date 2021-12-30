@@ -29,7 +29,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 Task<int>[] tasks =
                          {
                         Delayed(TimeSpan.FromMilliseconds(1)),
-                        Delayed(TimeSpan.FromMilliseconds(50)),
+                        Delayed(TimeSpan.FromMilliseconds(45)),
                         Delayed(TimeSpan.FromMilliseconds(100)),
                         Delayed(TimeSpan.FromMilliseconds(200))
                     };
@@ -45,7 +45,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 TimeSpan duration = sw.Elapsed;
                 if (cancellation != null)
                     Assert.True(cancellation.IsCancellationRequested, "Cancellation");
-                Assert.True(duration >= TimeSpan.FromMilliseconds(50) &&
+                Assert.True(duration >= TimeSpan.FromMilliseconds(45) &&
                               duration < TimeSpan.FromMilliseconds(100), "Duration");
                 Assert.True(succeed, "Succeed");
                 Assert.Equal(50, result);
@@ -91,7 +91,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 Task<int>[] tasks =
                          {
                         Delayed(TimeSpan.FromMilliseconds(1)),
-                        Delayed(TimeSpan.FromMilliseconds(50)),
+                        Delayed(TimeSpan.FromMilliseconds(45)),
                         Delayed(TimeSpan.FromMilliseconds(100)),
                         Delayed(TimeSpan.FromMilliseconds(200))
                     };
@@ -136,7 +136,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             Task<int>[] tasks =
                     {
                         Delayed(TimeSpan.FromMilliseconds(1)),
-                        Delayed(TimeSpan.FromMilliseconds(50)),
+                        Delayed(TimeSpan.FromMilliseconds(45)),
                         Delayed(TimeSpan.FromMilliseconds(100)),
                         Delayed(TimeSpan.FromMilliseconds(200))
                     };
@@ -186,7 +186,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             Task[] tasks =
                     {
                         Task.Delay(TimeSpan.FromMilliseconds(1)),
-                        Task.Delay(TimeSpan.FromMilliseconds(50)),
+                        Task.Delay(TimeSpan.FromMilliseconds(45)),
                         Task.Delay(TimeSpan.FromMilliseconds(100)),
                         Task.Delay(TimeSpan.FromMilliseconds(200))
                     };
@@ -202,7 +202,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             TimeSpan duration = sw.Elapsed;
             if(cancellation != null)
                 Assert.True(cancellation.IsCancellationRequested, "Cancellation");
-            Assert.True(duration >= TimeSpan.FromMilliseconds(50) &&
+            Assert.True(duration >= TimeSpan.FromMilliseconds(45) &&
                           duration < TimeSpan.FromMilliseconds(100), "Duration");
             await all.WithTimeout(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
             cancellation?.Dispose();
