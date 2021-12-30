@@ -23,7 +23,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             }
             catch (Exception ex)
             {
-                string formatted = ex.FormatLazy(ErrorFormattingOption.IncludeLineNumber);
+                string formatted = ex.FormatLazy(IncludeLineNumber | IncludeFullUnformattedDetails);
                 int idx0 = formatted.IndexOf(nameof(FormattingException_HaveAllStackInOrder_WithLocation_Test), StringComparison.Ordinal);
                 Assert.NotEqual(-1, idx0);
                 int idx1 = formatted.IndexOf(nameof(Step1Async), StringComparison.Ordinal);
@@ -49,7 +49,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 // check location
                 int idx6 = formatted.IndexOf(".cs", StringComparison.Ordinal);
                 Assert.NotEqual(-1, idx6);
-                int idx7 = formatted.IndexOf(" line ", StringComparison.Ordinal);
+                int idx7 = formatted.IndexOf("line ", StringComparison.Ordinal);
                 Assert.NotEqual(-1, idx7);
             }
 
@@ -68,7 +68,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             }
             catch (Exception ex)
             {
-                var formatted = ex.Format(IncludeLineNumber);
+                var formatted = ex.Format(IncludeLineNumber | IncludeFullUnformattedDetails);
                 int idx0 = formatted.IndexOf(nameof(FormattingException_HaveAllStackInOrder_WithLocation_Test), StringComparison.Ordinal);
                 Assert.NotEqual(-1, idx0);
                 int idx1 = formatted.IndexOf(nameof(Step1Async), StringComparison.Ordinal);
@@ -94,7 +94,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 // check location
                 int idx6 = formatted.IndexOf(".cs", StringComparison.Ordinal);
                 Assert.NotEqual(-1, idx6);
-                int idx7 = formatted.IndexOf(" line ", StringComparison.Ordinal);
+                int idx7 = formatted.IndexOf("line ", StringComparison.Ordinal);
                 Assert.NotEqual(-1, idx7);
             }
 
@@ -157,9 +157,9 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             }
             catch (Exception ex)
             {
-                var formatted = ex.Format();
+                var formatted = ex.Format(IncludeFullUnformattedDetails);
                 int idx3 = formatted.IndexOf("~ 3 ~>", StringComparison.Ordinal);
-                int idxStart = formatted.IndexOf("~ Start Task ~>", StringComparison.Ordinal);
+                int idxStart = formatted.IndexOf("~ Start ~>", StringComparison.Ordinal);
                 int idxFor = formatted.IndexOf("Parallel.For", StringComparison.Ordinal);
                 Assert.NotEqual(-1, idx3);
                 Assert.NotEqual(-1, idxStart);
