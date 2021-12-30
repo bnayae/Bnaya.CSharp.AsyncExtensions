@@ -18,11 +18,6 @@ on:
     
   
 jobs:
-  validate-repo-prefix:
-    uses: weknow-network/weknow-workflows/.github/workflows/validate-repo-prefix.yml@main
-    with:
-      organization: weknow-network
-      repo-prefix: wk-net-svc-
 
   version_increment:
     uses: weknow-network/weknow-workflows/.github/workflows/dotnet-increment-version.yml@main
