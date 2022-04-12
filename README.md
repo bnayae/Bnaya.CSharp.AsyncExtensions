@@ -22,3 +22,9 @@ Install-Package Bnaya.CSharp.AsyncExtensions
   * Instance-able
     * AsyncLock 
 
+
+Looking for other extensions?  
+Check the following
+- [Json extenssions](https://github.com/weknow-network/Weknow-Json-Extensions)
+- [Basic extensions](https://github.com/weknow-network/Weknow-BasicExtensions/blob/master/README.md)
+- [DI extensions](https://github.com/weknow-network/Weknow-DI-Extensions)
