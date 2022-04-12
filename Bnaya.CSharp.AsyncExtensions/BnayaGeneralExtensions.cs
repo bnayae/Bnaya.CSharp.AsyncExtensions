@@ -48,8 +48,8 @@ namespace System
             var weak = new WeakReference<Action>(action);
             Action result = () =>
             {
-                Action act;
-                if (weak.TryGetTarget(out act))
+                Action? act;
+                if (weak.TryGetTarget(out act) && act != null)
                     act();
             };
             return result;
@@ -71,7 +71,7 @@ namespace System
             var weak = new WeakReference<Action<T>>(action);
             Action<T> result = m =>
             {
-                Action<T> act;
+                Action<T>? act;
                 if (weak.TryGetTarget(out act))
                     act(m);
             };
@@ -97,7 +97,7 @@ namespace System
             var weak = new WeakReference<Action<T1, T2>>(action);
             Action<T1, T2> result = (m1, m2) =>
             {
-                Action<T1, T2> act;
+                Action<T1, T2>? act;
                 if (weak.TryGetTarget(out act))
                     act(m1, m2);
             };
@@ -124,7 +124,7 @@ namespace System
             var weak = new WeakReference<Action<T1, T2, T3>>(action);
             Action<T1, T2, T3> result = (m1, m2, m3) =>
             {
-                Action<T1, T2, T3> act;
+                Action<T1, T2, T3>? act;
                 if (weak.TryGetTarget(out act))
                     act(m1, m2, m3);
             };
@@ -146,7 +146,7 @@ namespace System
             var weak = new WeakReference<Func<T1, TResult>>(action);
             Func<T1, TResult?> result = (m1) =>
             {
-                Func<T1, TResult> act;
+                Func<T1, TResult>? act;
                 if (weak.TryGetTarget(out act))
                     return act(m1);
                 return default(TResult);
@@ -173,7 +173,7 @@ namespace System
             var weak = new WeakReference<Func<T1, T2, TResult>>(action);
             Func<T1, T2, TResult?> result = (m1, m2) =>
             {
-                Func<T1, T2, TResult> act;
+                Func<T1, T2, TResult>? act;
                 if (weak.TryGetTarget(out act))
                     return act(m1, m2);
                 return default(TResult);
@@ -201,7 +201,7 @@ namespace System
             var weak = new WeakReference<Func<T1, T2, T3, TResult>>(action);
             Func<T1, T2, T3, TResult?> result = (m1, m2, m3) =>
             {
-                Func<T1, T2, T3, TResult> act;
+                Func<T1, T2, T3, TResult>? act;
                 if (weak.TryGetTarget(out act))
                     return act(m1, m2, m3);
                 return default(TResult);
@@ -225,7 +225,7 @@ namespace System
             var weak = new WeakReference<Func<T, Task>>(action);
             Func<T, Task> result = m =>
             {
-                Func<T, Task> act;
+                Func<T, Task>? act;
                 if (weak.TryGetTarget(out act))
                     return act(m);
                 return Task.CompletedTask;
@@ -249,7 +249,7 @@ namespace System
             var weak = new WeakReference<Func<T1, T2, Task>>(action);
             Func<T1, T2, Task> result = (m1, m2) =>
             {
-                Func<T1, T2, Task> act;
+                Func<T1, T2, Task>? act;
                 if (weak.TryGetTarget(out act))
                     return act(m1, m2);
                 return Task.CompletedTask;
@@ -273,7 +273,7 @@ namespace System
             var weak = new WeakReference<Func<T1, T2, T3, Task>>(action);
             Func<T1, T2, T3, Task> result = (m1, m2, m3) =>
             {
-                Func<T1, T2, T3, Task> act;
+                Func<T1, T2, T3, Task>? act;
                 if (weak.TryGetTarget(out act))
                     return act(m1, m2, m3);
                 return Task.CompletedTask;

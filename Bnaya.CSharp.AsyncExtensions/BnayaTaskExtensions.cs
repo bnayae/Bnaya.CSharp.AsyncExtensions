@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -197,7 +198,7 @@ namespace System.Threading.Tasks
             var weak = new WeakReference<Action>(action);
             Action tmp = () =>
             {
-                if (weak.TryGetTarget(out Action act))
+                if (weak.TryGetTarget(out Action? act))
                     act();
             };
             return cancellation.Register(tmp);
@@ -215,13 +216,13 @@ namespace System.Threading.Tasks
         [Obsolete("CancellationToken.Register become weak, no need for this method, will be deleted next version", false)]
         public static CancellationTokenRegistration RegisterWeak(
             this CancellationToken cancellation,
-            Action<object> action,
+            Action<object?> action,
             object state)
         {
-            var weak = new WeakReference<Action<object>>(action);
-            Action<object> tmp = (state_) =>
+            var weak = new WeakReference<Action<object?>>(action);
+            Action<object?> tmp = (state_) =>
             {
-                if (weak.TryGetTarget(out Action<object> act))
+                if (weak.TryGetTarget(out Action<object?>? act) && act != null)
                     act(state_);
             };
             return cancellation.Register(tmp, state);
@@ -490,5 +491,48 @@ namespace System.Threading.Tasks
 
 
         #endregion // WhenN
+
+        #region ToArrayAsync
+
+        /// <summary>
+        /// Converts to Array
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items">The items.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns></returns>
+        public static async Task<T[]> ToArrayAsync<T>(
+            this IAsyncEnumerable<T> items,
+            CancellationToken cancellationToken = default)
+        {
+            List<T> list = await ToListAsync<T>(items, cancellationToken);
+            return list.ToArray();
+        }
+
+        #endregion // ToArrayAsync
+
+        #region ToListAsync
+
+        /// <summary>
+        /// Converts to list.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items">The items.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns></returns>
+        public static async Task<List<T>> ToListAsync<T>(
+            this IAsyncEnumerable<T> items,
+            CancellationToken cancellationToken = default)
+        {
+            List<T> list = new ();
+            await foreach (T item in items.WithCancellation(cancellationToken))
+            {
+                list.Add(item);
+            }
+
+            return list;
+        }
+
+        #endregion // ToListAsync
     }
 }

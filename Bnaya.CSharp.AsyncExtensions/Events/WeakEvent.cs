@@ -221,7 +221,7 @@ public sealed class WeakEvent<T> : IDisposable
         /// <returns>
         ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(object obj) =>
+        public override bool Equals(object? obj) =>
             object.Equals(obj, base.Target);
 
         /// <summary>
@@ -231,7 +231,7 @@ public sealed class WeakEvent<T> : IDisposable
         /// <returns>
         /// true if the current object is equal to the <paramref name="other">other</paramref> parameter; otherwise, false.
         /// </returns>
-        public bool Equals(Action<T> other)
+        public bool Equals(Action<T>? other)
         {
             if (other == null)
                 return false;
@@ -248,12 +248,12 @@ public sealed class WeakEvent<T> : IDisposable
         /// <returns>
         /// true if the current object is equal to the <paramref name="other">other</paramref> parameter; otherwise, false.
         /// </returns>
-        public bool Equals(WeakReference<Action<T>> other)
+        public bool Equals(WeakReference<Action<T>>? other)
         {
             Action<T> target = this.Target;
             if (target == null)
                 return false;
-            if (other.TryGetTarget(out var otherTarget))
+            if (other?.TryGetTarget(out var otherTarget) ?? false)
                 return target.Equals(otherTarget);
             return false;
         }
@@ -265,12 +265,12 @@ public sealed class WeakEvent<T> : IDisposable
         /// <returns>
         /// true if the current object is equal to the <paramref name="other">other</paramref> parameter; otherwise, false.
         /// </returns>
-        public bool Equals(EquatableWeakReference other)
+        public bool Equals(EquatableWeakReference? other)
         {
             Action<T> target = this.Target;
             if (target == null)
                 return false;
-            if (other.TryGetTarget(out var otherTarget))
+            if (other?.TryGetTarget(out var otherTarget) ?? false)
                 return target.Equals(otherTarget);
             return false;
         }

@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+
 using static System.Threading.Tasks.ErrorFormattingOption;
 
 [assembly: InternalsVisibleTo("Bnaya.CSharp.AsyncExtensions.Tests")]
@@ -23,7 +24,7 @@ namespace System.Threading.Tasks
     /// semantical logging where it might be filter out and won't be present.
     /// </summary>
     [SuppressMessage("Design", "RCS1194:Implement exception constructors.", Justification = "<Pending>")]
-    public class LazyFormatException: Exception
+    public class LazyFormatException : Exception
     {
         private const int MAX_LEN_OF_INNER_SNAP_LINE = 50;
         private const string THROW_PREFIX = "  # Throw";
@@ -82,7 +83,7 @@ namespace System.Threading.Tasks
         public LazyFormatException(
             Exception innerException,
             ErrorFormattingOption option = Default,
-            char replaceWith = '-') : 
+            char replaceWith = '-') :
                 base(string.Empty, innerException)
         {
             _option = option;
@@ -102,7 +103,7 @@ namespace System.Threading.Tasks
             SerializationInfo info,
             StreamingContext context)
         {
-            InnerException.GetObjectData(info, context);
+            InnerException?.GetObjectData(info, context);
         }
 
         #endregion // GetObjectData
@@ -112,10 +113,14 @@ namespace System.Threading.Tasks
         /// <summary>
         /// Gets or sets the name of the application or the object that causes the error.
         /// </summary>
-        public override string Source 
-        { 
-            get => InnerException.Source; 
-            set => InnerException.Source = value; 
+        public override string? Source
+        {
+            get => InnerException?.Source;
+            set
+            {
+                if(InnerException != null)
+                    InnerException.Source = value;
+            }
         }
 
         #endregion // Source
@@ -125,7 +130,7 @@ namespace System.Threading.Tasks
         /// <summary>
         /// Gets a string representation of the immediate frames on the call stack.
         /// </summary>
-        public override string StackTrace => InnerException.StackTrace;
+        public override string? StackTrace => InnerException?.StackTrace;
 
         #endregion // StackTrace
 
@@ -134,9 +139,14 @@ namespace System.Threading.Tasks
         /// <summary>
         /// Gets or sets a link to the help file associated with this exception.
         /// </summary>
-        public override string HelpLink 
-        {   get => InnerException.HelpLink;
-            set => InnerException.HelpLink = value; 
+        public override string? HelpLink
+        {
+            get => InnerException?.HelpLink;
+            set
+            {
+                if (InnerException != null)
+                    InnerException.HelpLink = value;
+            }
         }
 
         #endregion // HelpLink
@@ -146,7 +156,7 @@ namespace System.Threading.Tasks
         /// <summary>
         /// Gets a message that describes the current exception.
         /// </summary>
-        public override string Message => InnerException.Message;
+        public override string Message => InnerException?.Message ?? string.Empty;
 
         #endregion // Message
 
@@ -158,7 +168,7 @@ namespace System.Threading.Tasks
         /// <returns>
         /// The first exception thrown in a chain of exceptions. If the <see cref="P:System.Exception.InnerException"></see> property of the current exception is a null reference (Nothing in Visual Basic), this property returns the current exception.
         /// </returns>
-        public override Exception GetBaseException() => InnerException.GetBaseException();
+        public override Exception GetBaseException() => InnerException?.GetBaseException() ?? base.GetBaseException();
 
         #endregion // GetBaseException
 
@@ -167,7 +177,7 @@ namespace System.Threading.Tasks
         /// <summary>
         /// Gets a collection of key/value pairs that provide additional user-defined information about the exception.
         /// </summary>
-        public override IDictionary Data => InnerException.Data;
+        public override IDictionary Data => InnerException?.Data ?? base.Data;
 
         #endregion // Data
 
@@ -180,7 +190,7 @@ namespace System.Threading.Tasks
         /// <returns>
         ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(object obj)=>  InnerException.Equals(obj);
+        public override bool Equals(object? obj) => InnerException?.Equals(obj) ?? false;
 
         #endregion // Equals
 
@@ -192,7 +202,7 @@ namespace System.Threading.Tasks
         /// <returns>
         /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
         /// </returns>
-        public override int GetHashCode() => InnerException.GetHashCode();
+        public override int GetHashCode() => InnerException?.GetHashCode() ?? base.GetHashCode();
 
         #endregion // GetHashCode
 
@@ -209,6 +219,7 @@ namespace System.Threading.Tasks
         {
             if (_toStringCache != null)
                 return _toStringCache;
+            if (InnerException == null) return base.ToString();
             _toStringCache = Format(InnerException, _option, _replaceWith);
             return _toStringCache;
         }
@@ -361,7 +372,7 @@ namespace System.Threading.Tasks
         /// <param name="withLineNumber">if set to <c>true</c> [with line number].</param>
         /// <returns></returns>
         private static List<string> ReBuildStack(
-            Exception exception,
+            Exception? exception,
             string indent = "",
             bool withLineNumber = false)
         {
@@ -387,11 +398,11 @@ namespace System.Threading.Tasks
 
                 if (!(exception is AggregateException))
                 {
-                    string message = string.Empty;
+                    string? message = string.Empty;
                     using (var reader = new StringReader(exception.Message))
                     {
                         message = reader.ReadLine();
-                        if (message.Length > MAX_LEN_OF_INNER_SNAP_LINE)
+                        if (message != null && message.Length > MAX_LEN_OF_INNER_SNAP_LINE)
                             message = message.Substring(0, MAX_LEN_OF_INNER_SNAP_LINE) + " ...";
                     }
                     tmp.Add($"{indent}{THROW_PREFIX} ({exception?.GetType()?.Name}): {message}\r\n");
@@ -404,7 +415,7 @@ namespace System.Threading.Tasks
                 {
                     while (true)
                     {
-                        string line = r.ReadLine();
+                        string? line = r.ReadLine();
                         if (line == null)
                             break;
                         line = line.Trim();
@@ -500,7 +511,7 @@ namespace System.Threading.Tasks
                 #endregion // Remove Duplicate Stack
 
                 stackDetails.InsertRange(0, tmp);
-                exception = exception.InnerException;
+                exception = exception?.InnerException;
             }
 
             return stackDetails;
