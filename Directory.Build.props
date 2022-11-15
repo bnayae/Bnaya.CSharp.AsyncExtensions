@@ -2,13 +2,13 @@
 	<PropertyGroup>
 		<Version>1.0.52</Version>
 		<PackageReleaseNotes>
-			Move to .NET 6
+			Move to .NET 7
 		</PackageReleaseNotes>
 	</PropertyGroup>
 	
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<LangVersion>10</LangVersion>
+		<TargetFramework>net7.0</TargetFramework>
+		<LangVersion>11.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Configurations>Debug;Release</Configurations>
