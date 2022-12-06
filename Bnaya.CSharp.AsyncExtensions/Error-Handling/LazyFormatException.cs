@@ -64,6 +64,7 @@ namespace System.Threading.Tasks
                 "at System.Threading.Tasks.Task.Wait",
                 "at System.Threading.Tasks.Parallel.ForWorker",
                 "at System.Threading.Tasks.Task.ExecuteWithThreadLocal",
+                "at Microsoft.Extensions.DependencyInjection.ServiceLookup."
             };
 
         #endregion
