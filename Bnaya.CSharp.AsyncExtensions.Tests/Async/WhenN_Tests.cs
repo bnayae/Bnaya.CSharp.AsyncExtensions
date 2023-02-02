@@ -194,8 +194,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             // act
 #pragma warning disable AsyncFixer05 // Implicit casting from Task<Task> to Task or awaiting Task<Task>
             Task all = await tasks
-                .WhenN(threshold, cancellation)
-                .ConfigureAwait(false);
+                .WhenN(threshold, cancellation);
 #pragma warning restore AsyncFixer05 // Implicit casting from Task<Task> to Task or awaiting Task<Task>
 
             // assert
@@ -205,7 +204,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 Assert.True(cancellation.IsCancellationRequested, "Cancellation");
             Assert.True(duration >= TimeSpan.FromMilliseconds(45) &&
                           duration < TimeSpan.FromMilliseconds(100), "Duration");
-            await all.WithTimeout(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+            await all.WithTimeout(TimeSpan.FromSeconds(1));
             cancellation?.Dispose();
         }
 

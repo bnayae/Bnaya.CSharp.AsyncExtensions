@@ -70,9 +70,9 @@ namespace System.Threading.Tasks
             TimeSpan timeout = default(TimeSpan))
         {
             //return task;
-            await WithTimeout((Task)task, timeout).ConfigureAwait(false);
+            await WithTimeout((Task)task, timeout);
 
-            return await task.ConfigureAwait(false);
+            return await task;
         }
 
         /// <summary>
@@ -93,13 +93,13 @@ namespace System.Threading.Tasks
             if (timeout == default(TimeSpan))
                 timeout = DefaultTimeout;
 
-            Task check = await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false);
+            Task check = await Task.WhenAny(task, Task.Delay(timeout));
             if (check != task)
             {
                 throw new TimeoutException($"Operations was timeout after [{timeout.TotalMinutes:N3}] minutes");
             }
             else
-                await task.ConfigureAwait(false); // throw if faulted
+                await task; // throw if faulted
         }
 
         #endregion // WithTimeout
@@ -124,14 +124,14 @@ namespace System.Threading.Tasks
             TimeSpan duration)
         {
             Task delay = Task.Delay(duration);
-            Task deadlockDetection = await Task.WhenAny(initTask, delay).ConfigureAwait(false);
+            Task deadlockDetection = await Task.WhenAny(initTask, delay);
             if (deadlockDetection == delay)
             {
                 return true;
             }
             else
             {
-                await initTask.ConfigureAwait(false);
+                await initTask;
                 return false;
             }
         }
@@ -175,6 +175,58 @@ namespace System.Threading.Tasks
 
             #endregion // Exception Handling
             return true;
+        }
+
+        #endregion // WithCancellation
+
+        #region WithCancellation
+
+        /// <summary>
+        /// Creates task with cancellation.
+        /// Use it only with API which don't get a cancellation token as a parameter.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="task">The task.</param>
+        /// <param name="cancellation">The cancellation.</param>
+        /// <param name="returnRalueOnCancellation">The return value on cancellation.</param>
+        /// <returns></returns>
+        [DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerStepThrough]
+        public static async Task<T> WithCancellation<T>(
+            this Task<T> task,
+            CancellationToken cancellation,
+            Func<T>? returnRalueOnCancellation = null)
+        {
+            if (returnRalueOnCancellation == null)
+            {
+                await WithCancellation((Task)task, cancellation);
+                return task.Result;
+            }
+
+            var tcs = new TaskCompletionSource<T>();
+            cancellation.Register(() => tcs.SetResult(returnRalueOnCancellation()));
+            Task<T> check = await Task.WhenAny(task, tcs.Task);
+            return check.Result;
+        }
+
+        /// <summary>
+        /// Creates task with cancellation.
+        /// Use it only with API which don't get a cancellation token as a parameter.
+        /// </summary>
+        /// <param name="task">The task.</param>
+        /// <param name="cancellation">The cancellation.</param>
+        [DebuggerHidden]
+        [DebuggerNonUserCode]
+        [DebuggerStepThrough]
+        public static async Task WithCancellation(
+            this Task task,
+            CancellationToken cancellation)
+        {
+            var tcs = new TaskCompletionSource();
+            cancellation.Register(() => tcs.SetCanceled());
+            Task check = await Task.WhenAny(task, tcs.Task);
+            await check; // throw if faulted
         }
 
         #endregion // WithCancellation
@@ -410,7 +462,7 @@ namespace System.Threading.Tasks
             Task anyTask = await Task.WhenAny(
                                     completionEvent.Task, // Succeed
                                     allTasks) // Passing tasks below threshold
-                                    .ConfigureAwait(false);
+                                    ;
 
             bool succeed = anyTask == completionEvent.Task;
             T[] response = queue.ToArray();
@@ -467,7 +519,7 @@ namespace System.Threading.Tasks
             Task anyTask = await Task.WhenAny(
                                     completionEvent.Task, // Succeed
                                     allTasks) // Passing tasks below threshold
-                                    .ConfigureAwait(false);
+                                    ;
 
             return allTasks;
 
