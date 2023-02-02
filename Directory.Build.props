@@ -37,7 +37,7 @@
 	<PropertyGroup>
 		<PackageReleaseNotes>
 			1.0.58 [BREAKING CHANGES] .NET 7
-			1.0.60 Add WithCancellation
+			1.0.61 Add WithCancellation
 		</PackageReleaseNotes>
 	</PropertyGroup>
 
