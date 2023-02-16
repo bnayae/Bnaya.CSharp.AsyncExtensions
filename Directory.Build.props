@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<Version>1.0.62</Version>
+		<Version>1.0.63</Version>
 		<PackageReleaseNotes>
 			Move to .NET 7
 		</PackageReleaseNotes>
@@ -36,8 +36,8 @@
 
 	<PropertyGroup>
 		<PackageReleaseNotes>
-			1.0.60 [BREAKING CHANGES] .NET 7
-			1.0.63 Add WithCancellation
+			1.0.61 [BREAKING CHANGES] .NET 7
+			1.0.64 Add WithCancellation
 		</PackageReleaseNotes>
 	</PropertyGroup>
 
