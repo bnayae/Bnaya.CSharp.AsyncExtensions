@@ -29,4 +29,5 @@ jobs:
       dotnet-version: 7.0.x
       include-prerelease: false
       test-project: Bnaya.CSharp.AsyncExtensions.Tests
+      test-switch: --filter category=ci
 
