@@ -18,8 +18,8 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageTags>event-source, pub, sub, pubsub, messaging, reliable, redis, weknow, bnaya</PackageTags>
-		<PackageProjectUrl>https://medium.com/weknow-network</PackageProjectUrl>
+		<PackageTags>event-source, pub, sub, pubsub, messaging, reliable, redis, bnaya</PackageTags>
+		<PackageProjectUrl>https://medium.com/@bnayae</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/bnayae/Bnaya.CSharp.AsyncExtensions</RepositoryUrl>
 		<RepositoryType>GitHub</RepositoryType>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

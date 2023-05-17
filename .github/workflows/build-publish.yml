@@ -13,15 +13,9 @@ on:
         required: false
         default: 'warning'
 
-    
-env: # https://docs.github.com/en/actions/learn-github-actions/environment-variables
-  BUILD_CONFIG: Release
-  DOTNET_VER: 7.0.x
-  INCLUDE_PRERELEASE: false
-  
 jobs: 
   build-nuget:
-    uses: weknow-network/weknow-workflows/.github/workflows/dotnet-build-deploy-public-nuget.yml@release/2023-02-15
+    uses: bnayae/open-workflows/.github/workflows/dotnet-build-deploy-public-nuget.yml@main
     secrets:
       NUGET_PUBLISH: ${{ secrets.NUGET_PUBLISH }}
     with:
