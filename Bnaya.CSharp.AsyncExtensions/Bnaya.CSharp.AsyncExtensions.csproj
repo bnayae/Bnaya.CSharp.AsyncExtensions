@@ -1,62 +1,74 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <AssemblyName>Bnaya.CSharp.AsyncExtensions</AssemblyName>
-    <RootNamespace>Bnaya.CSharp.AsyncExtensions</RootNamespace>
-    <Description>Useful extensions contribution by Bnaya Eshet
-Blog: http://blogs.microsoft.co.il/bnaya/
+	<PropertyGroup>
+		<AssemblyName>Bnaya.CSharp.AsyncExtensions</AssemblyName>
+		<RootNamespace>Bnaya.CSharp.AsyncExtensions</RootNamespace>
+		<Description>
+			Useful extensions contribution by Bnaya Eshet
+			Blog: http://blogs.microsoft.co.il/bnaya/
 
-Source Code:
-https://github.com/bnayae/Bnaya.CSharp.AsyncExtensions
-
-
-# NuGet
-this library available on NuGet via
-Install-Package Bnaya.CSharp.AsyncExtensions
-
-## This library have the following goodies:
-* Exception Handling
-  * ThrowAll (produce AggregateException when waiting on Task.WhenAll)
-  * Format (format async exception into friendlier call-stack representation)
-* Timeout (will apply timeout semantic for any Task)
-  * WithTimeout (will throw on timeout)
-  * IsTimeoutAsync (will return indication without throwing, ideal for SLA checks [practice: check and produce warning])
-* Cancellation
-  * CancelSafe (will run the CancellationTokenSource.Cancel within try catch and prevent unexpected side effect which can happen when cancellation token registration throw)
-* Friendly async locking facilities (which can replace the classical lock statement).
-  * Extensions
-    * TryAcquireAsync
-    * AcquireAsync
-  * Instance-able
-    * AsyncLock 
-* WhenN: use to complete task after n task succeed
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</Description>
-    <Copyright>Bnaya Eshet ©</Copyright>
-    <PackageTags>async, Parallel, await, task, timeout, deadlock, cancel, cancellation, bnaya</PackageTags>
-    <PackageReleaseNotes>Release 1.0.27 (Breaking Changes)
-Remove obsolete api of exception formatting.
-
-Add FormatLazy which is better citizen for modern logger scenarios.
-It will do the formatting on the ToString time i.e won't format logs which was filtered out.
-
-example:
-logger.LogError(ex.FormatLazy(), "Fault execution");</PackageReleaseNotes>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+			Source Code:
+			https://github.com/bnayae/Bnaya.CSharp.AsyncExtensions
 
 
+			# NuGet
+			this library available on NuGet via
+			Install-Package Bnaya.CSharp.AsyncExtensions
 
-  <ItemGroup>
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-  </ItemGroup>
+			## This library have the following goodies:
+			* Exception Handling
+			* ThrowAll (produce AggregateException when waiting on Task.WhenAll)
+			* Format (format async exception into friendlier call-stack representation)
+			* Timeout (will apply timeout semantic for any Task)
+			* WithTimeout (will throw on timeout)
+			* IsTimeoutAsync (will return indication without throwing, ideal for SLA checks [practice: check and produce warning])
+			* Cancellation
+			* CancelSafe (will run the CancellationTokenSource.Cancel within try catch and prevent unexpected side effect which can happen when cancellation token registration throw)
+			* Friendly async locking facilities (which can replace the classical lock statement).
+			* Extensions
+			* TryAcquireAsync
+			* AcquireAsync
+			* Instance-able
+			* AsyncLock
+			* WhenN: use to complete task after n task succeed
+
+			THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+		</Description>
+		<Copyright>Bnaya Eshet ©</Copyright>
+		<PackageTags>async, Parallel, await, task, timeout, deadlock, cancel, cancellation, bnaya</PackageTags>
+		<PackageReleaseNotes>
+			Release 1.0.27 (Breaking Changes)
+			Remove obsolete api of exception formatting.
+
+			Add FormatLazy which is better citizen for modern logger scenarios.
+			It will do the formatting on the ToString time i.e won't format logs which was filtered out.
+
+			example:
+			logger.LogError(ex.FormatLazy(), "Fault execution");
+		</PackageReleaseNotes>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+
+
+	<ItemGroup>
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+	</ItemGroup>
 
 
 </Project>
