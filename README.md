@@ -1,4 +1,6 @@
-# Bnaya.CSharp.AsyncExtensions [![NuGet](https://img.shields.io/nuget/v/Bnaya.CSharp.AsyncExtensions.svg)](https://www.nuget.org/packages/Bnaya.CSharp.AsyncExtensions/)  [![Prepare](https://github.com/weknow-network/Bnaya.CSharp.AsyncExtensions/actions/workflows/prepare-nuget.yml/badge.svg)](https://github.com/weknow-network/Bnaya.CSharp.AsyncExtensions/actions/workflows/prepare-nuget.yml) [![Deploy](https://github.com/weknow-network/Bnaya.CSharp.AsyncExtensions/actions/workflows/build-publish.yml/badge.svg)](https://github.com/weknow-network/Bnaya.CSharp.AsyncExtensions/actions/workflows/build-publish.yml)
+# Bnaya.CSharp.AsyncExtensions [![NuGet](https://img.shields.io/nuget/v/Bnaya.CSharp.AsyncExtensions.svg)](https://www.nuget.org/packages/Bnaya.CSharp.AsyncExtensions/)  [![Prepare](https://github.com/weknow-network/Bnaya.CSharp.AsyncExtensions/actions/workflows/prepare-nuget.yml/badge.svg)](https://github.com/weknow-network/Bnaya.CSharp.AsyncExtensions/actions/workflows/prepare-nuget.yml) [![Deploy](https://github.com/weknow-network/Bnaya.CSharp.AsyncExtensions/actions/workflows/build-publish.yml/badge.svg)](https://github.com/weknow-network/Bnaya.CSharp.AsyncExtensions/actions/workflows/build-publish.yml)  
+[![codecov](https://codecov.io/gh/bnayae/Bnaya.CSharp.AsyncExtensions/branch/main/graph/badge.svg?token=DTVPFSESJM)](https://codecov.io/gh/bnayae/Bnaya.CSharp.AsyncExtensions)  
+
 Contribution of useful async pattern, API, Extensions, etc.
 
 # NuGet
