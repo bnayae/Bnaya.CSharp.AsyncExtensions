@@ -53,13 +53,33 @@ namespace System.Threading.Tasks
         /// when failed the LockScope.Acquired will equals false
         /// </summary>
         /// <param name="overrideTimeout">The override timeout.</param>
-        /// <returns>lock disposal and acquired indication</returns>
-        public async Task<LockScope> TryAcquireAsync(TimeSpan overrideTimeout = default(TimeSpan))
+        /// <param name="cancellation">The cancellation.</param>
+        /// <returns>
+        /// lock disposal and acquired indication
+        /// </returns>
+        public async Task<LockScope> TryAcquireAsync(
+                                        TimeSpan overrideTimeout = default,
+                                        CancellationToken cancellation = default)
         {
             var timeout = overrideTimeout == default ? _defaultTimeout : overrideTimeout;
-            bool acquired = await _gate.WaitAsync(timeout).ConfigureAwait(false);            
+            bool acquired = await _gate.WaitAsync(timeout, cancellation);            
             return new LockScope(_gate, acquired, this /* keep alive - avoid disposal */);
         }
+
+        /// <summary>
+        /// Try to acquire async lock,
+        /// when failed the LockScope.Acquired will equals false
+        /// </summary>
+        /// <param name="cancellation">The cancellation.</param>
+        /// <returns>
+        /// lock disposal and acquired indication
+        /// </returns>
+        public async Task<LockScope> TryAcquireAsync(CancellationToken cancellation)
+        {
+            bool acquired = await _gate.WaitAsync(_defaultTimeout, cancellation);            
+            return new LockScope(_gate, acquired, this /* keep alive - avoid disposal */);
+        }
+
 
         #endregion // TryAcquireAsync
 
@@ -70,11 +90,38 @@ namespace System.Threading.Tasks
         /// when it will throw TimeoutException
         /// </summary>
         /// <param name="overrideTimeout">The override timeout.</param>
-        /// <returns>lock disposal</returns>
+        /// <param name="cancellation">The cancellation.</param>
+        /// <returns>
+        /// lock disposal
+        /// </returns>
+        /// <exception cref="System.TimeoutException"></exception>
         /// <exception cref="TimeoutException">when acquire lock fail</exception>
-        public async Task<IDisposable> AcquireAsync(TimeSpan overrideTimeout = default(TimeSpan))
+        public async Task<IDisposable> AcquireAsync(
+                                        TimeSpan overrideTimeout = default,
+                                        CancellationToken cancellation = default)
         {
-            var scope = await TryAcquireAsync(overrideTimeout).ConfigureAwait(false);
+            var scope = await TryAcquireAsync(overrideTimeout, cancellation);
+            if (!scope.Acquired)
+            {
+                scope.Dispose();
+                throw new TimeoutException();
+            }
+            return scope;
+        }
+
+        /// <summary>
+        /// Try to acquire async lock,
+        /// when it will throw TimeoutException
+        /// </summary>
+        /// <param name="cancellation">The cancellation.</param>
+        /// <returns>
+        /// lock disposal
+        /// </returns>
+        /// <exception cref="System.TimeoutException"></exception>
+        /// <exception cref="TimeoutException">when acquire lock fail</exception>
+        public async Task<IDisposable> AcquireAsync(CancellationToken cancellation)
+        {
+            var scope = await TryAcquireAsync(_defaultTimeout, cancellation);
             if (!scope.Acquired)
             {
                 scope.Dispose();

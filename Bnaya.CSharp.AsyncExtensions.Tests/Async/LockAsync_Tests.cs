@@ -78,6 +78,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                             .Select(_ => AsyncLock_TryAcquireAsync_Test());
             await Task.WhenAll(tasks);
         }
+
         [Fact]
         public async Task AsyncLock_TryAcquireAsync_Test()
         {
@@ -101,6 +102,32 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             }
             await fireForget;
         }
+
+        [Fact]
+        public async Task AsyncLock_TryAcquireAsync_Cancellation_Test()
+        {
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var locker = new AsyncLock(TimeSpan.FromMilliseconds(200));
+            Task fireForget;
+            using (LockScope scope = await locker.TryAcquireAsync(cts.Token))
+            {
+                Assert.True(scope.Acquired);
+                fireForget = Task.Run(async () =>
+                {
+                    var sw = Stopwatch.StartNew();
+                    using (LockScope scopeInner = await locker.TryAcquireAsync(TimeSpan.FromMilliseconds(50)))
+                    {
+                        sw.Stop();
+                        // 48: timer may not be so accurate
+                        Assert.True(sw.ElapsedMilliseconds >= 48, $"sw.ElapsedMilliseconds >= 50, Actual = {sw.ElapsedMilliseconds}");
+                        Assert.False(scopeInner.Acquired, "scopeInner.Acquired");
+                    }
+                });
+                await Task.Delay(100).ConfigureAwait(false);
+            }
+            await fireForget;
+        }
+
         [Fact]
         public async Task AsyncLock_TryAcquireAsync_WithGcCollect_Test()
         {
@@ -122,6 +149,7 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
                 await fireForget;
             }
         }
+
         [Fact]
         public async Task AsyncLock_TryAcquireAsync_Out_WithGcCollect_Test()
         {
@@ -134,6 +162,23 @@ namespace Bnaya.CSharp.AsyncExtensions.Tests
             {
                 var locker = new AsyncLock(TimeSpan.FromMilliseconds(200));
                 return locker.TryAcquireAsync(TimeSpan.FromSeconds(5));
+                // locker can be disposed if not held
+            }
+        }
+
+        [Fact]
+        public async Task AsyncLock_TryAcquireAsync_Out_WithGcCollect_Cancellation_Test()
+        {
+            using (LockScope scope = await GetLockScope())
+            {
+                CollectGC();
+            }
+
+            Task<LockScope> GetLockScope()
+            {
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                var locker = new AsyncLock(TimeSpan.FromMilliseconds(200));
+                return locker.TryAcquireAsync(cts.Token);
                 // locker can be disposed if not held
             }
         }
